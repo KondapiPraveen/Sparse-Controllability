@@ -1,11 +1,11 @@
 # Sparse-Controllability
 This Repository contains the source codes for the Sparse Controllability Project. The files include Greedy, Modified Deterministic and Random Actuator Schedulers for Noiseless LDS. MPC based piecewise sparse control for Noisy LDS
 
-### x(k+1) = Ax(k) + Bu(k) k = 0,1,..,K
+### $`x(k+1) = Ax(k) + Bu(k) k = 0,1,..,K`$
 #### $`A \in R^{n \times n}, B \in R^{n \times m}`$
 #### Helper Files
 CtrlMatrix.m - Generate a Controllability Matrix given A, B, K.  
-bck_lwr_mtx.m - Generate 2 Large Matrices, One is a Large Block Lower traingle Matrix, Second is column stack of $`A^i`$ i= 1,2,...,K. Used in MPC Formulation.  
+bck_lwr_mtx.m - Generate 2 Large Matrices, One is a Large Block Lower traingle Matrix, Second is column stack of $`A^i, i= 1,2,...,K`$. Used in MPC Formulation.  
 Erdos_Renyi.m - Generate a Erdos Renyi Random Graph where each edge is present with probability $`2\frac{\ln(n)}{n}`$.  
 KF.m - Kalman Filter.  
 KF_prd.m - Kalman Filter return the prediction for the next state..  
@@ -35,7 +35,7 @@ ActSch_R2_PerfVsTime.m - Sparse Actuator Scheduling Result 2 : A-Optimality Perf
 ActSch_R3_NPerfVsFSparsity.m - Sparse Actuator Scheduling Result 3 : $`\frac{Tr(W_S^{-1})}{Tr(W^{-1})}`$ vs $`\frac{s}{m}`$ for various n and lower and upper bounds -- **Used in CDC Conference Draft**.  
 ActSch_R4_TStepsVsSparsity.m - Sparse Actuator Scheduling Result 4 : Bounds for the Number of iterations of Greedy Algorithm to Stop over various Sparsity levels -- *Not used for the current Plots*.  
 ActSch_R5_ApprxVsSparsity.m - Sparse Actuator Scheduling Result 5 : Ratio of smallest and largest Eigenvalues for some sparsity level compared  to Fully actuated case -- *Not used for the current Plots*.  
-ActSch_R6_CDFPlot.m - Sparse Actuator Scheduling Result 6 : CDF plot of the proposed Greedy algorithm for fixed support and dynamic support **Used in CDC Conference Draft**.  
+ActSch_R6_CDFPlot.m - Sparse Actuator Scheduling Result 6 : CDF plot of the proposed Greedy algorithm for fixed support and dynamic support -- **Used in CDC Conference Draft**.  
 NsysLS_KF_P_OMP.m - MPC based controller for Noisy LDS, Comparision for both OMP and POMP case.  
 POMP_R1_Performance.m - Results for POMP Algorithm for different Sparsity, Trails, Systems, residue levels.  
 POMP_R2_Performance.m - Time Steps (K) taken for controllability with Bounds.  
