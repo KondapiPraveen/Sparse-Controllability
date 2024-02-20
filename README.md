@@ -2,7 +2,7 @@
 This Repository contains the source codes for the Sparse Controllability Project. The files include Greedy, Modified Deterministic and Random Actuator Schedulers for Noiseless LDS. MPC based piecewise sparse control for Noisy LDS
 
 ### x(k+1) = Ax(k) + Bu(k) k = 0,1,..,K
-#### $`A \in R^{n \cross n}, B \in R^{n \cross m}`$
+#### $`A \in R^{n x n}, B \in R^{n x m}`$
 #### Helper Files
 CtrlMatrix.m - Generate a Controllability Matrix given A, B, K.  
 bck_lwr_mtx.m - Generate 2 Large Matrices, One is a Large Block Lower traingle Matrix, Second is column stack of $`A^i`$ i= 1,2,...,K. Used in MPC Formulation.  
