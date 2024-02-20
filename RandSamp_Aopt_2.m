@@ -1,4 +1,4 @@
-% Unweighted Random Scheduling (Adapted to Piecewise Sparsity Case
+% Unweighted Random Scheduling (Adapted to Piecewise Sparsity)
 function [Sopt, Fopt] = RandSamp_Aopt_2(R,m,t,d)
     % A, B ; LDS Matrices
     % t : # time steps
