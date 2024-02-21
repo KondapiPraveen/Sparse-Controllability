@@ -5,7 +5,7 @@ function [S, c, Fopt1, Fwopt, Fopt2] = SparseScheduling(R,m,t,s)
     % s : Sparsity Level at each Time Step
     % c = 0; Fwopt = 0;
     n = size(R,1);
-    e_t = 0.001;
+    e_t = 1e-8;
     % R = CtrlMatrix(A,B,t);
     V = ((R*R.')^(-1/2))*R;
     U = V; % Alg 2
@@ -22,8 +22,8 @@ function [S, c, Fopt1, Fwopt, Fopt2] = SparseScheduling(R,m,t,s)
     Fopt1 = trace(inv(W_S + e_t*eye(n)));
     
     % UnWeighted Scheduling (actuators without replacement)
-    %Fopt2 = 0;
-    
+    Fopt2 = 0;
+    %{
     S2 = DualSet_2(V,U,s,t);
     W_S = R(:,S2)*R(:,S2).';
     Fopt2 = trace(inv(W_S + e_t*eye(n)));

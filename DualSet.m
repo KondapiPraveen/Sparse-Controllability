@@ -57,7 +57,7 @@ function [c, Supp] = DualSet(V,U,s,ts)
             end
         end
         %}
-        rw = ceil(j/m); p = mod(j,m)+1;
+        rw = ceil(j/m); p = j-(rw-1)*m;
         % Val = setdiff(Val,j);
         
         if ((sum(S(rw,:)) < s) || (sum(S(rw,:))<=s && S(rw,p) == 1))

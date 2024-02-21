@@ -68,7 +68,7 @@ function [S, t, Fopt, LBnd, UBnd, Talys, Talys2] = GreedyScheduling_Aopt_1(R,m,t
             %}
             % Valid Support Update
             V = setdiff(V,p); % Remove the selected actuator
-            k = ceil(p/m); j = mod(p,m) + 1; % Find the time step and actuator no.
+            k = ceil(p/m); j = p-(k-1)*m; % Find the time step and actuator no.
             if sum(S_k(k,:)) < s % Check if the new actutator can be added
                 S_k(k,j)=1;
                 S = union(S,p);

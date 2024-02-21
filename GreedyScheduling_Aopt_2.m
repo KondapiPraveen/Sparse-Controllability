@@ -26,7 +26,7 @@ function [S, Fopt] = GreedyScheduling_Aopt_2(R,m,ts,s)
         p = V(l);
         % Update
         i = ceil(p/m); % Time Index
-        j = mod(p,m) + 1; % Actuator Index
+        j = p-(i-1)*m; % Actuator Index
         if sum(S_k(i,:)) > s
             S_k(i,j) = 0; V = setdiff(V,p); % Remove the actutator 
             % from the support set and update the feasible set

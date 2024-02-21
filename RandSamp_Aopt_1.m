@@ -4,7 +4,7 @@ function [Sopt, Wopt, Fopt, Fwopt] = RandSamp_Aopt_1(R,B,t,d)
     % t : # time steps
     % d : sparsity level
     [n,m] = size(B);
-    e_t = 0.001;
+    e_t = 1e-8;
     % R = CtrlMatrix(A,B,t);
     Sopt = [];
     Wopt = [];
@@ -27,7 +27,7 @@ function [Sopt, Wopt, Fopt, Fwopt] = RandSamp_Aopt_1(R,B,t,d)
         while i < d*t
             [l,~] = histcounts(rand,CProb);
             p = V(logical(l));
-            k = ceil(p/m); j = mod(p,m) + 1; % Find the time step and actuator no.
+            k = ceil(p/m); j = p-(k-1)*m; % Find the time step and actuator no.
             sig(k,j)=1;
             S = union(S,p);
             w(k,j) = sqrt(w(k,j).^2 + 1/(d*m*Prob(logical(l))));

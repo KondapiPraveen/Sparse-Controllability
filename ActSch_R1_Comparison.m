@@ -1,13 +1,13 @@
 %% Result I : f_opt vs Sparsity - Comparision of Greedy vs Actuator Schedulers
 clear; clc; close all
-n = 40; m = n/2; t = n;
+n = 100; m = n/2; t = n;
 lowlvl = 3;
 stp = 2; rng(0);
 S = 3:stp:15;
 lg = length(S);
 Ropt = zeros(2,lg); % Row 1 - Unweighted, Row 2 - Weighted
 Sopt = zeros(3,lg); % Row 1 - Unweighted, Row 2 - Weighted
-NSys = 1;
+NSys = 100;
 Giopt = zeros(NSys,lg); % Forward Greedy
 Giopt2 = zeros(NSys,lg); % Reverse Greedy
 Riopt = zeros(NSys,lg); % Unweighted
@@ -43,18 +43,18 @@ mdl = 'NM2 ';
 Lthrsh = zeros(NSys,1);
 e_0 = 0.01;
 tic;
-for i = 1:NSys
+parfor i = 1:NSys
     A = MA(:,:,i); B = MB(:,:,i);
     % A = I - (MD(:,:,i)-MW(:,:,i))/n;
     R = CtrlMatrix(A,B,t);
     % lowlvl = n-rank(A)+2;
     for k=1:lg
         s = S(k);
-        %[S_s,~,Siopt(i,k),Swiopt(i,k),Siopt2(i,k)] = SparseScheduling(R,m,t,s);
+        [S_s,~,Siopt(i,k),Swiopt(i,k),Siopt2(i,k)] = SparseScheduling(R,m,t,s);
         [~,~,Giopt(i,k)] = GreedyScheduling_Aopt_1(R,m,t,s,e_0);
-        [~,Giopt2(i,k)] = GreedyScheduling_Aopt_2(R,m,t,s);
-        %[S_rw,~,~,Rwiopt(i,k)] = RandSamp_Aopt(R,m,t,s);
-        %[S_r,Riopt(i,k)] = RandSamp_Aopt_2(R,m,t,s);
+        %[~,Giopt2(i,k)] = GreedyScheduling_Aopt_2(R,m,t,s);
+        [S_rw,~,~,Rwiopt(i,k)] = RandSamp_Aopt(R,m,t,s);
+        [S_r,Riopt(i,k)] = RandSamp_Aopt_2(R,m,t,s);
     end
     Lthrsh(i) = trace(inv(R*R.' + 0.001*eye(n)));
 end
@@ -68,14 +68,14 @@ Ropt = Ropt/NSys; Lthrsh = Lthrsh/NSys;
 toc;
 %%
 figure();
-%semilogy(S,Ropt(2,:),'r--','LineWidth',3,'Marker','d','MarkerSize',10,'DisplayName','Random (Weighted)');
-%semilogy(S,Sopt(3,:),'LineWidth',3,'Marker','+','MarkerSize',10,'DisplayName','Deterministic (Wo Replacement)','Color',"#000099");
-%semilogy(S,Sopt(1,:),'LineWidth',3,'Marker','+','MarkerSize',10,'DisplayName','Deterministic (Unweighted)','Color',"#009900");
-%semilogy(S,Ropt(1,:),'r-','LineWidth',3,'Marker','d','MarkerSize',10,'DisplayName','Random (Unweighted)');
-%semilogy(S,Sopt(2,:),'--','LineWidth',3,'Marker','+','MarkerSize',10,'DisplayName','Deterministic (Weighted)','Color',"#009900");
-semilogy(S,Gopt(1,:),'b-','LineWidth',3,'Marker','s','MarkerSize',10,'DisplayName','Forward Greedy');
+semilogy(S,Ropt(2,:),'r--','LineWidth',3,'Marker','d','MarkerSize',10,'DisplayName','Random (Weighted)');
 grid on; hold on
-semilogy(S,Gopt(2,:),'LineWidth',3,'Marker','s','MarkerSize',10,'DisplayName','Reverse Greedy','Color',"#7E2F8E");
+%semilogy(S,Sopt(3,:),'LineWidth',3,'Marker','+','MarkerSize',10,'DisplayName','Deterministic (Wo Replacement)','Color',"#000099");
+semilogy(S,Sopt(1,:),'LineWidth',3,'Marker','+','MarkerSize',10,'DisplayName','Deterministic (Unweighted)','Color',"#009900");
+semilogy(S,Ropt(1,:),'r-','LineWidth',3,'Marker','d','MarkerSize',10,'DisplayName','Random (Unweighted)');
+semilogy(S,Sopt(2,:),'--','LineWidth',3,'Marker','+','MarkerSize',10,'DisplayName','Deterministic (Weighted)','Color',"#009900");
+semilogy(S,Gopt(1,:),'b-','LineWidth',3,'Marker','s','MarkerSize',10,'DisplayName','Greedy');
+%semilogy(S,Gopt(2,:),'LineWidth',3,'Marker','s','MarkerSize',10,'DisplayName','Reverse Greedy','Color',"#7E2F8E");
 %semilogy(S,Lthrsh*ones(1,lg),'k-.','LineWidth',3,'DisplayName','No Sparisty Constriant');
 set(gca,'FontSize',20,'FontWeight','bold')
 legend();
