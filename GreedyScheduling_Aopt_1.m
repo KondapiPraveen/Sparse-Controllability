@@ -35,8 +35,11 @@ function [S, t, Fopt, LBnd, UBnd, Talys, Talys2] = GreedyScheduling_Aopt_1(R,m,t
             Y = sum(X.*(v.'),2);
             % [Trc, l] = max(diag(X*X.')./(1+diag(Y)));
             UpVec = (vecnorm(X,2,2).^2)./(1+Y); % Update Vector
+            %{
             [Trc, l] = max(UpVec(end:-1:1));
             l = length(V)-l+1;
+            %}
+            [Trc, l] = max(UpVec);
             % [Trc, l] = max(diag(v.'*IW_S*IW_S*v)./(1+Y));
             p = V(l);
             if Trc <= 0

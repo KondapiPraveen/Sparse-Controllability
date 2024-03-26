@@ -1,14 +1,13 @@
 %% Scheduling Result 3 : Normalized Tr(W_S^{-1}) vs (s/m) Performance Analysis of A-Opt Greedy Algorithm
 clear; clc; close all
-N = 20:15:80; m = 50;
+N = 20:15:80; m = 50; % State, Input Dimensions
 rng(0) % For Reproducability
-NSys = 10; % # Independent Trials
+NSys = 1e2; % # Independent Trials
 e_0 = 1e-2;
 %e_0 = eps;
 
 FS = 0.1:0.1:1;
 FS = union(FS,1);
-S = FS*m;
 lg = length(FS);
 ln = length(N);
 Giopt = zeros(ln,lg,NSys); % Time Varying Support
@@ -18,11 +17,12 @@ GSiopt = zeros(ln,lg,NSys); % Fixed Support
 tic;
 
 for j=1:ln
-    n = N(j);% m = n;
+    n = N(j); %m = n;
     MA = Erdos_Renyi(n,NSys);
-    MB = rand(n,m,NSys);
-    
+    MB = randn(n,m,NSys);
     %B = eye(n); % m=n
+    
+    S = FS*m;
     parfor l=1:NSys
         A = MA(:,:,l); B = MB(:,:,l);
         R = CtrlMatrix(A,B,n);

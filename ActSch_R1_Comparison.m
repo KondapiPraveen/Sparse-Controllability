@@ -1,9 +1,9 @@
 %% Result I : f_opt vs Sparsity - Comparision of Greedy vs Actuator Schedulers
 clear; clc; close all
-n = 100; m = n/2; t = n;
+n = 100; m = n/2; t = n; % State, Input dimension, Control Time Steps
 lowlvl = 3;
 stp = 2; rng(0);
-S = 3:stp:15;
+S = 3:stp:15; % Sparsity Level
 lg = length(S);
 Ropt = zeros(2,lg); % Row 1 - Unweighted, Row 2 - Weighted
 Sopt = zeros(3,lg); % Row 1 - Unweighted, Row 2 - Weighted
@@ -71,16 +71,16 @@ figure();
 semilogy(S,Ropt(2,:),'r--','LineWidth',3,'Marker','d','MarkerSize',10,'DisplayName','Random (Weighted)');
 grid on; hold on
 %semilogy(S,Sopt(3,:),'LineWidth',3,'Marker','+','MarkerSize',10,'DisplayName','Deterministic (Wo Replacement)','Color',"#000099");
-semilogy(S,Sopt(1,:),'LineWidth',3,'Marker','+','MarkerSize',10,'DisplayName','Deterministic (Unweighted)','Color',"#009900");
 semilogy(S,Ropt(1,:),'r-','LineWidth',3,'Marker','d','MarkerSize',10,'DisplayName','Random (Unweighted)');
-semilogy(S,Sopt(2,:),'--','LineWidth',3,'Marker','+','MarkerSize',10,'DisplayName','Deterministic (Weighted)','Color',"#009900");
+semilogy(S,Sopt(1,:),'LineWidth',3,'Marker','+','MarkerSize',10,'DisplayName','Deterministic (Unweighted)','Color',"#009900");
 semilogy(S,Gopt(1,:),'b-','LineWidth',3,'Marker','s','MarkerSize',10,'DisplayName','Greedy');
+semilogy(S,Sopt(2,:),'--','LineWidth',3,'Marker','+','MarkerSize',10,'DisplayName','Deterministic (Weighted)','Color',"#009900");
 %semilogy(S,Gopt(2,:),'LineWidth',3,'Marker','s','MarkerSize',10,'DisplayName','Reverse Greedy','Color',"#7E2F8E");
 %semilogy(S,Lthrsh*ones(1,lg),'k-.','LineWidth',3,'DisplayName','No Sparisty Constriant');
 set(gca,'FontSize',20,'FontWeight','bold')
 legend();
-xlabel('Sparsity (\it{s})','FontWeight','bold','FontSize',20);
-ylabel('Tr({W_S}^{-1})','FontWeight','bold','FontSize',20);
+xlabel('$\rm{Sparsity (s)}$','Interpreter','latex','FontWeight','bold','FontSize',20);
+ylabel('$\rm{Tr({W_S}^{-1})}$','Interpreter','latex','FontWeight','bold','FontSize',20);
 % title(['NTrails = ', num2str(NSys), ' N = ',num2str(n), ' M = ',num2str(m)])
 title('Tr({W_S}^{-1}) vs Sparsity (s)')
 %ylim([Lthrsh*0.9 max([Gopt(1), Ropt(1,1), Ropt(2,1),Sopt(2,1), Sopt(1,1)])])
