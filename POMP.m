@@ -12,13 +12,14 @@ function sk = POMP(D,b,K,s)
     SetU = 1:K*m; SetV = SetU; r = b;
     S = zeros(K,m); % Binary Matrix - row : time index, col : act index
     sk = zeros(K*m,1); % solution
-    Dnorm = vecnorm(D).^2;
+    Dnorm = vecnorm(D);
+    %D = D./Dnorm;
     % Iteration
     for k=1:K*s
         % SetV = setdiff(SetU,SuppA);
         Dk = D(:,SetV);
         hk = Dk.'*r; % residual estimate
-        [~,ij] = max(abs(hk.')./Dnorm(SetV));
+        [~,ij] = max(abs(hk));
         j = SetV(ij);
         SuppS = union(SuppS, j);
         bck = ceil(j/m); p = mod(j,m)+1; % time index, act index

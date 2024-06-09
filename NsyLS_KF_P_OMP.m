@@ -21,7 +21,7 @@ x0 = zeros(n,1); % Reachability
 NMSEi1 = zeros(ls,K+1,NSys); NMSEi2 = zeros(ls,K+1,NSys);
 UOMP = zeros(ls,K,NSys); UPOMP = zeros(ls,K,NSys);
 %R = zeros(m*k); % xf = zeros(2*n,1);
-R = 0*eye(m*k);
+R = 0*eye(m*k); % Regularizer for Input
 
 % System Matrices
 MA = Erdos_Renyi(n, NSys);
