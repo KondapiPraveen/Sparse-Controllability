@@ -1,13 +1,13 @@
 %% Result I : f_opt vs Sparsity - Comparision of Greedy vs Actuator Schedulers
 clear; clc; close all
-n = 100; m = n; t = n; % State, Input dimension, Control Time Steps
-lowlvl = 3;
+n = 100; m = n; % State, Input dimension, Control Time Steps
+%lowlvl = 3;
 stp = 2; rng(0);
-S = 3:stp:15; % Sparsity Level
+S = 2:8; % Sparsity Level
 lg = length(S);
 Ropt = zeros(2,lg); % Row 1 - Unweighted, Row 2 - Weighted
 Sopt = zeros(3,lg); % Row 1 - Unweighted, Row 2 - Weighted
-NSys = 100;
+NSys = 1;
 Giopt = zeros(NSys,lg); % Forward Greedy
 Giopt2 = zeros(NSys,lg); % Reverse Greedy
 Riopt = zeros(NSys,lg); % Unweighted
@@ -46,13 +46,17 @@ tic;
 for i = 1:NSys
     A = MA(:,:,i); B = MB(:,:,i);
     % A = I - (MD(:,:,i)-MW(:,:,i))/n;
-    R = CtrlMatrix(A,B,t);
     % lowlvl = n-rank(A)+2;
+    t = ceil(n/2);
+    R = CtrlMatrix(A,B,t);
     for k=1:lg
-        s = S(k);
-        [S_s,~,Siopt(i,k),Swiopt(i,k),Siopt2(i,k)] = SparseScheduling(R,m,t,s);
-        [~,~,Giopt(i,k)] = GreedyScheduling_Aopt_1(R,m,t,s,e_0);
-            %[~,Giopt2(i,k)] = GreedyScheduling_Aopt_2(R,m,t,s);
+        s = S(k); %t = ceil(n/s);
+        %R = CtrlMatrix(A,B,t);
+        [~,S_ki] = FullBLI(A,B,t,s);
+        [S_g,Giopt(i,k)] = GreedyScheduling_Aopt_FullB(R,m,S_ki,t,s);
+        if (t*s > n)
+            [S_s,~,Siopt(i,k),Swiopt(i,k),Siopt2(i,k)] = SparseScheduling(R,m,t,s);
+        end
         [S_rw,~,~,Rwiopt(i,k)] = RandSamp_Aopt(R,m,t,s);
         [S_r,Riopt(i,k)] = RandSamp_Aopt_2(R,m,t,s);
     end
@@ -84,7 +88,9 @@ ylabel('$\rm{Tr({W_S}^{-1})}$','Interpreter','latex','FontWeight','bold','FontSi
 % title(['NTrails = ', num2str(NSys), ' N = ',num2str(n), ' M = ',num2str(m)])
 title('Tr({W_S}^{-1}) vs Sparsity (s)')
 %ylim([Lthrsh*0.9 max([Gopt(1), Ropt(1,1), Ropt(2,1),Sopt(2,1), Sopt(1,1)])])
-xlim([2 16])
+xlim([S(1)-1 S(end)+1]);
+lim = max(Gopt(1,:));
+ylim([100,lim*10]);
 %%
 figure();
 X = categorical(S);

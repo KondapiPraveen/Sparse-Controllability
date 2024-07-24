@@ -19,7 +19,7 @@ function sk = POMP(D,b,K,s)
         % SetV = setdiff(SetU,SuppA);
         Dk = D(:,SetV);
         hk = Dk.'*r; % residual estimate
-        [~,ij] = max(abs(hk));
+        [~,ij] = max(abs(hk./(Dnorm(SetV).')));
         j = SetV(ij);
         SuppS = union(SuppS, j);
         bck = ceil(j/m); p = mod(j,m)+1; % time index, act index

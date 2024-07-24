@@ -4,7 +4,7 @@ function [Sopt, Wopt, Fopt, Fwopt] = RandSamp_Aopt(R,m,t,d)
     % t : # time steps
     % d : sparsity level
     n = size(R,1);
-    e_t = 1e-8;
+    e_t = 1e-20;
     % R = CtrlMatrix(A,B,t);
     Sopt = [];
     Wopt = [];
@@ -50,14 +50,26 @@ function [Sopt, Wopt, Fopt, Fwopt] = RandSamp_Aopt(R,m,t,d)
         W_Sw = R(:,S)*(diag(W).^2)*R(:,S).';
         W_S = R(:,S)*R(:,S).';
         
-        fval = trace(inv(W_S + e_t*eye(n))); % A-Optimality Criteria
+        % fval = trace(inv(W_S + e_t*eye(n))); % A-Optimality Criteria
+        D = svd(W_S);
+        Rnk = rank(W_S);
+        if Rnk<n
+            D(Rnk+1:end) = e_t;
+        end
+        fval = sum(1./(D + e_t));
         if fval < Fopt
             Sopt = S;
             Wopt = W;
             Fopt = fval;
         end
         
-        fwval = trace(inv(W_Sw + e_t*eye(n)));
+        %fwval = trace((W_Sw + e_t*eye(n))\eye(n));
+        Dw = svd(W_Sw);
+        Rnk = rank(W_Sw);
+        if Rnk<n
+            Dw(Rnk+1:end) = e_t;
+        end
+        fwval = sum(1./(Dw + e_t));
         if fwval < Fwopt
             Fwopt = fwval;
         end

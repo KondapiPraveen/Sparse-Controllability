@@ -1,7 +1,8 @@
 # Sparse-Controllability
 This Repository contains the source codes for the Sparse Controllability Project. The files include Greedy, Modified Deterministic and Random Actuator Schedulers for Noiseless LDS. MPC based piecewise sparse control for Noisy LDS
 
-### $x(k+1) = Ax(k) + Bu(k) k = 0,1,..,K$
+### $x(k+1) = Ax(k) + Bu(k) + v(k) \quad k = 0,1,..,K$
+### $y(k) = Cx(k) + w(k)$
 #### $A \in R^{n \times n}, B \in R^{n \times m}$
 ### Helper Files
   - CtrlMatrix.m - Generate a Controllability Matrix given A, B, K.  
@@ -22,6 +23,7 @@ This Repository contains the source codes for the Sparse Controllability Project
   - DualSet_2.m - Deterministic Actuator Scheduling for Unweighted Scheduling (Adapted to Piecewise Sparsity Case) -- *Not used in the current Plots*.
   - GreedyScheduling_Aopt_1.m - Propsed Greedy Scheduling with A-Optimality $Tr(W_S^{-1})$.  
   - GreedyScheduling_Aopt_2.m - Reverse Greedy Scheduling with A-Optimality $Tr(W_S^{-1})$ -- *Not used in current Plots*.  
+  - GreedyScheduling_Aopt_FullB - Greedy Scheduling to find Linearly Independent actuators/columns using A-Optimality $Tr(W_S^{-1})$
   - GreedyScheduling_Eopt.m - Greedy Scheduling with E-Optimality (min. Eigenvalue metric) -- *Not used in the current Plots*.  
   - GreedyScheduling_Static_Aopt_1.m - Propsed Greedy Scheduling with A-Optimality $Tr(W_S^{-1})$ for Fixed Support Case -- *Not used in the current Plots*.  
   - RandomSamp_Aopt.m - Weighted Random Sampling adapted to Piecewise Sparsity.  
@@ -36,7 +38,13 @@ This Repository contains the source codes for the Sparse Controllability Project
   - ActSch_R3_NPerfVsFSparsity.m - Sparse Actuator Scheduling Result 3 : $\frac{Tr(W_S^{-1})}{Tr(W^{-1})}$ vs $\frac{s}{m}$ for various n and lower and upper bounds -- **Used in CDC Conference Draft**.  
   - ActSch_R4_TStepsVsSparsity.m - Sparse Actuator Scheduling Result 4 : Bounds for the Number of iterations of Greedy Algorithm to Stop over various Sparsity levels -- *Not used for the current Plots*.  
   - ActSch_R5_ApprxVsSparsity.m - Sparse Actuator Scheduling Result 5 : Ratio of smallest and largest Eigenvalues for some sparsity level compared  to Fully actuated case -- *Not used for the current Plots*.  
-  - ActSch_R6_CDFPlot.m - Sparse Actuator Scheduling Result 6 : CDF plot of the proposed Greedy algorithm for fixed support and dynamic support -- **Used in CDC Conference Draft**.  
-  - NsysLS_KF_P_OMP.m - MPC based controller for Noisy LDS, Comparision for both OMP and POMP case.  
+  - ActSch_R6_CDFPlot.m - Sparse Actuator Scheduling Result 6 : CDF plot of the proposed Greedy algorithm for fixed support and dynamic support -- **Used in CDC Conference Draft**.
+  - ActSch_R7_Comparison_FullB.m - Comparison of Greedy, Deterministic, Random Scheudlers when rank($B$)=$n$ -- **Used for Journal**
+  - ActSch_R8_NPerfVsFSparsity_FullB.m - Plot $\frac{Tr(W_S^{-1})}{Tr(W^{-1})}$ vs $\frac{s}{m}$ when rank($B$)=$n$ --**Used for Journal**
+  - NsysLS_KF_P_OMP.m - Plot MSE vs Time Steps $K$ (vary $m$) -- **Used for Journal**.  
+  - NSysLS_KF_OMP_VarNs - Plot MSE vs Sparsity ($s$) for various $\sigma^2$  -- **Used for Journal**.
+  - NSysLS_KF_OMP_Varxf - Plot MSE vs $\Vert \textbf{x}_f \Vert$ for various $s$ -- **Used for Journal**.
+  - NSysLS_KF_OMP_Varx0 - Plot MSE vs $\Vert \textbf{x}_0 \Vert$ for various $s$ and $\textbf{x}_0 = \textbf{0}$ -- **Used for Journal**.
   - POMP_R1_Performance.m - Results for POMP Algorithm for different Sparsity, Trails, Systems, residue levels.  
   - POMP_R2_Performance.m - Time Steps (K) taken for controllability with Bounds.  
+
