@@ -8,6 +8,7 @@ This Repository contains the source codes for the Sparse Controllability Project
   - CtrlMatrix.m - Generate a Controllability Matrix given A, B, K.  
   - bck_lwr_mtx.m - Generate 2 Large Matrices, One is a Large Block Lower traingle Matrix, Second is column stack of $A^i, i= 1,2,...,K$. Used in MPC Formulation.  
   - Erdos_Renyi.m - Generate a Erdos Renyi Random Graph where each edge is present with probability $2\frac{\ln(n)}{n}$.  
+  - FullBLI - Greedy algorithm to find Linearly Independent actuators/columns using A-Optimality $Tr(W_S^{-1})$
   - KF.m - Kalman Filter.  
   - KF_prd.m - Kalman Filter return the prediction for the next state..  
   - OMP.m - Orthogonal Matching Pursuit.  
@@ -23,7 +24,7 @@ This Repository contains the source codes for the Sparse Controllability Project
   - DualSet_2.m - Deterministic Actuator Scheduling for Unweighted Scheduling (Adapted to Piecewise Sparsity Case) -- *Not used in the current Plots*.
   - GreedyScheduling_Aopt_1.m - Propsed Greedy Scheduling with A-Optimality $Tr(W_S^{-1})$.  
   - GreedyScheduling_Aopt_2.m - Reverse Greedy Scheduling with A-Optimality $Tr(W_S^{-1})$ -- *Not used in current Plots*.  
-  - GreedyScheduling_Aopt_FullB - Greedy Scheduling to find Linearly Independent actuators/columns using A-Optimality $Tr(W_S^{-1})$
+  - GreedyScheduling_Aopt_FullB - Greedy Scheduling when rank($B$)=$n$ (Initial Set is non-empty).
   - GreedyScheduling_Eopt.m - Greedy Scheduling with E-Optimality (min. Eigenvalue metric) -- *Not used in the current Plots*.  
   - GreedyScheduling_Static_Aopt_1.m - Propsed Greedy Scheduling with A-Optimality $Tr(W_S^{-1})$ for Fixed Support Case -- *Not used in the current Plots*.  
   - RandomSamp_Aopt.m - Weighted Random Sampling adapted to Piecewise Sparsity.  
