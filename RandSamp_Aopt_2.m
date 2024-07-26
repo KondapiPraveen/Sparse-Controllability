@@ -1,10 +1,10 @@
 % Unweighted Random Scheduling (Adapted to Piecewise Sparsity)
-function [Sopt, Fopt] = RandSamp_Aopt_2(R,m,t,d)
+function [Sopt, Fopt] = RandSamp_Aopt_2(R,m,t,d,e_0)
     % A, B ; LDS Matrices
     % t : # time steps
     % d : sparsity level
     n = size(R,1);
-    e_t = 1e-20;
+    %e_t = 1e-20;
     % R = CtrlMatrix(A,B,t);
     Sopt = [];
     % Wopt = [];
@@ -57,9 +57,9 @@ function [Sopt, Fopt] = RandSamp_Aopt_2(R,m,t,d)
         D = svd(W_S);
         Rnk = rank(W_S);
         if Rnk<n
-            D(Rnk+1:end) = e_t;
+            D(Rnk+1:end) = e_0;
         end
-        fval = sum(1./(D + e_t));
+        fval = sum(1./(D + e_0));
         if fval < Fopt
             Sopt = S;
             % Wopt = W;

@@ -1,5 +1,5 @@
 % Weighted Random Scheduling (Adapted to Piecewise Sparsity Case)
-function [Sopt, Wopt, Fopt, Fwopt] = RandSamp_Aopt(R,m,t,d)
+function [Sopt, Wopt, Fopt, Fwopt] = RandSamp_Aopt(R,m,t,d,e_0)
     % A, B ; LDS Matrices
     % t : # time steps
     % d : sparsity level
@@ -67,9 +67,9 @@ function [Sopt, Wopt, Fopt, Fwopt] = RandSamp_Aopt(R,m,t,d)
         Dw = svd(W_Sw);
         Rnk = rank(W_Sw);
         if Rnk<n
-            Dw(Rnk+1:end) = e_t;
+            Dw(Rnk+1:end) = e_0;
         end
-        fwval = sum(1./(Dw + e_t));
+        fwval = sum(1./(Dw + e_0));
         if fwval < Fwopt
             Fwopt = fwval;
         end

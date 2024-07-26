@@ -4,13 +4,13 @@
 %          ts - Control Horizon, s - sparsity level
 % Outputs : S - Actutator Scheudle, Fopt - Metric Value, t - # Iterations
 %           Talys - Lower Bound on t, Talys2 - Approx Bound on t
-function [S, Fopt, LBnd, UBnd, Talys, Talys2] = GreedyScheduling_Aopt_FullB(R,m,S_ki,ts,s)
+function [S, Fopt, LBnd, UBnd, Talys, Talys2] = GreedyScheduling_Aopt_FullB(R,IW_S,m,S_ki,ts,s)
     n = size(R,1);
     
     % Controllability matrix and Its gramiam
     % R = CtrlMatrix(A,B,ts);
     % W_S = R(:,S)*R(:,S).';
-    % IW_S = (1/e_t)*eye(n);
+    % e_t = 0; % IW_S = (1/e_t)*eye(n);
     % IW_S = inv(R(:,S)*R(:,S).' + e_t*eye(n));
     
 	% Greedy Algorithm
@@ -24,29 +24,28 @@ function [S, Fopt, LBnd, UBnd, Talys, Talys2] = GreedyScheduling_Aopt_FullB(R,m,
     V = 1:m*ts; % Valid Support
     V = setdiff(V,S);
     r=0;
-    e_0 = 1e-20;
-    IW_S = inv(R(:,S)*R(:,S).'+e_0*eye(n));
     while ~isempty(V)
         % optimize for the schedule
 	    % p is index obtained after optimization
         % p = 0; % To track optimal actuator at a given iteration
 	    % Tropt = trace(IW_S); % Optimal Trace Value
-            
+        
         v = R(:,V);
 	    X = v.'*IW_S;
-        Y = sum(X.*(v.'),2);
+        Y = sum(X.*v.',2);
 	    % [Trc, l] = max(diag(X*X.')./(1+diag(Y)));
         UpVec = (vecnorm(X,2,2).^2)./(1+Y); % Update Vector
         %{
 	    [Trc, l] = max(UpVec(end:-1:1));
         l = length(V)-l+1;
         %}
-	    [Trc, l] = max(UpVec);
+	    [~, l] = max(abs(UpVec));
         % [Trc, l] = max(diag(v.'*IW_S*IW_S*v)./(1+Y));
         p = V(l);
-        if Trc <= 0
-            fprintf('Error \n');
+        if UpVec(l) <= 0
+            fprintf('Negative Trace Error 2\n');
         end
+        
         %{
 	    for l=V
             % S_i = union(S,l); % Intermediate Support

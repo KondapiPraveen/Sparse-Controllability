@@ -2,12 +2,12 @@
 clear; clc; close all
 n = 100; m = n; % State, Input dimension, Control Time Steps
 %lowlvl = 3;
-stp = 2; rng(0);
+rng(0); %stp = 2;
 S = 2:8; % Sparsity Level
 lg = length(S);
 Ropt = zeros(2,lg); % Row 1 - Unweighted, Row 2 - Weighted
 Sopt = zeros(3,lg); % Row 1 - Unweighted, Row 2 - Weighted
-NSys = 1;
+NSys = 100;
 Giopt = zeros(NSys,lg); % Forward Greedy
 Giopt2 = zeros(NSys,lg); % Reverse Greedy
 Riopt = zeros(NSys,lg); % Unweighted
@@ -38,12 +38,12 @@ clear Msk MskUt Wi Slt
 MA = Erdos_Renyi(n,NSys);
 MB = rand(n,m,NSys);
 % B = eye(n);
-mdl = 'NM2 ';
+% mdl = 'NM2 ';
 % I = eye(n);
 Lthrsh = zeros(NSys,1);
-e_0 = 0.00001;
+e_01 = 1e-5; e_0 = 1e-20;
 tic;
-for i = 1:NSys
+parfor i = 1:NSys
     A = MA(:,:,i); B = MB(:,:,i);
     % A = I - (MD(:,:,i)-MW(:,:,i))/n;
     % lowlvl = n-rank(A)+2;
@@ -51,14 +51,13 @@ for i = 1:NSys
     R = CtrlMatrix(A,B,t);
     for k=1:lg
         s = S(k); %t = ceil(n/s);
-        %R = CtrlMatrix(A,B,t);
-        [~,S_ki] = FullBLI(A,B,t,s);
-        [S_g,Giopt(i,k)] = GreedyScheduling_Aopt_FullB(R,m,S_ki,t,s);
+        [IW_S,~,S_ki] = FullBLI(A,B,t,s,e_01);
+        [S_g,Giopt(i,k)] = GreedyScheduling_Aopt_FullB(R,IW_S,m,S_ki,t,s);
         if (t*s > n)
-            [S_s,~,Siopt(i,k),Swiopt(i,k),Siopt2(i,k)] = SparseScheduling(R,m,t,s);
+            [S_s,~,Siopt(i,k),Swiopt(i,k),Siopt2(i,k)] = SparseScheduling(R,m,t,s,e_0);
         end
-        [S_rw,~,~,Rwiopt(i,k)] = RandSamp_Aopt(R,m,t,s);
-        [S_r,Riopt(i,k)] = RandSamp_Aopt_2(R,m,t,s);
+        [S_rw,~,~,Rwiopt(i,k)] = RandSamp_Aopt(R,m,t,s,e_0);
+        [S_r,Riopt(i,k)] = RandSamp_Aopt_2(R,m,t,s,e_0);
     end
     Lthrsh(i) = trace(inv(R*R.' + 0.001*eye(n)));
 end
@@ -70,7 +69,7 @@ Lthrsh = sum(Lthrsh);
 Gopt = Gopt/NSys; Sopt= Sopt/NSys;
 Ropt = Ropt/NSys; Lthrsh = Lthrsh/NSys;
 toc;
-%%
+%% Plotting - Main Result
 figure();
 semilogy(S,Ropt(2,:),'r--','LineWidth',3,'Marker','d','MarkerSize',10,'DisplayName','Random (Weighted)');
 grid on; hold on
@@ -105,7 +104,7 @@ xlabel('Sparsity Level (s)');
 ylabel('Relative Tr({W_S}^{-1}) w.r.t Greedy Scheduling');
 str = sprintf(' N = %d M = %d NSys = %0.1e',n,m,NSys);
 legend('Forward Greedy', 'Reverse Greedy', 'Random (Unweighted)','Random (Weighted)','Deterministic (Unweighted)','Deterministic (Weighted)')
-title(strcat(mdl,str));
+title(str);
 %%
 %{
 figure();

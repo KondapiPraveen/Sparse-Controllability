@@ -1,4 +1,4 @@
-function [S, c, Fopt1, Fwopt, Fopt2] = SparseScheduling(R,m,t,s)
+function [S, c, Fopt1, Fwopt, Fopt2] = SparseScheduling(R,m,t,s,e_0)
     % Results from this are labeled as Deterministic Scheduling
     % A,B are System Parameters
     % t : # Time Steps
@@ -29,15 +29,15 @@ function [S, c, Fopt1, Fwopt, Fopt2] = SparseScheduling(R,m,t,s)
     D = svd(W_S);
 	Rnk = rank(W_S);
     if Rnk<n
-        D(Rnk+1:end) = e_t;
+        D(Rnk+1:end) = e_0;
     end
-    Fopt1 = sum(1./(D + e_t));
+    Fopt1 = sum(1./(D + e_0));
     
     % UnWeighted Scheduling (actuators without replacement)
     Fopt2 = 0;
     %{
     S2 = DualSet_2(V,U,s,t);
     W_S = R(:,S2)*R(:,S2).';
-    Fopt2 = trace(inv(W_S + e_t*eye(n)));
+    Fopt2 = trace(inv(W_S + e_0*eye(n)));
     %}
 end

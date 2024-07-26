@@ -39,7 +39,7 @@ function [c, Supp] = DualSet(V,U,s,ts)
         dif = cli-cui;
         [mdif,q] = max(dif);
         if mdif < 0
-            fprintf('Error in 1 \n');
+            fprintf('Error at DualSet \n');
             break;
         end
         cl = cli(q); cu = cui(q);

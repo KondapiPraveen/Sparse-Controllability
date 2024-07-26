@@ -2,10 +2,11 @@
 clear; close all; clc; rng(0); % For Reproducability
 % Initialization
 FS = 0.1:0.1:1;
+FS = union(FS,1);
 NSys = 100; % # Independent Trials
 
 N = 60:20:100; % State, Input Dimensions % Setup - 1 
-
+e_0 = 1e-5;
 %{
 % Setup - 2
 N = 20:20:80; m = 100;
@@ -42,8 +43,8 @@ for j=1:ln
                 LBnd(j,k,l) = LBnd2/UBnd1;
                 UBnd(j,k,l) = UBnd1/LBnd2;
             else
-               [~,S_ki] = FullBLI(A,B,n,s);
-               [~,Giopt(j,k,l)] = GreedyScheduling_Aopt_FullB(R,m,S_ki,n,s);
+               [IW_S,~,S_ki] = FullBLI(A,B,n,s,e_0);
+               [~,Giopt(j,k,l)] = GreedyScheduling_Aopt_FullB(R,IW_S,m,S_ki,n,s);
                %[~,~,Giopt(j,k,l), LBnd(j,k,l), UBnd(j,k,l)] = GreedyScheduling_Aopt_1(R,m,n,s,e_0);
                %[~,~,GSiopt(j,k,l)] = GreedyScheduling_Static_Aopt_1(R,m,n,s,e_0);
             end

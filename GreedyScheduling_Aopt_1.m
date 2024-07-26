@@ -43,7 +43,7 @@ function [S, t, Fopt, LBnd, UBnd, Talys, Talys2] = GreedyScheduling_Aopt_1(R,m,t
             % [Trc, l] = max(diag(v.'*IW_S*IW_S*v)./(1+Y));
             p = V(l);
             if Trc <= 0
-                fprintf('Error \n');
+                fprintf('Negative Trace Error 2\n');
             end
             %{
             for l=V

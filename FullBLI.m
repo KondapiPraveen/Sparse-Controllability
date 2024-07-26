@@ -4,11 +4,11 @@
 % Control Time : K >= n/s
 % Sparsity Level : s
 % Output - S (Binary Matrix)
-function [S,S_k] = FullBLI(A,B,K,s)
+function [IW_S,S,S_k] = FullBLI(A,B,K,s,e_0)
     % Initialization
     m = size(B,2); n = size(A,1);
-    S_k = zeros(K,m); e_t = 1e-15;
-    S = []; IW_S = (1/e_t)*eye(n);
+    S_k = zeros(K,m); %e_0 = 1e-20;
+    S = []; IW_S = (1/e_0)*eye(n);
     rankC = zeros(K,1); % Collection of rank information A^iB
     R = zeros(n,m*K);
     % Find rank(A^iB)
@@ -31,7 +31,10 @@ function [S,S_k] = FullBLI(A,B,K,s)
             X = v.'*IW_S;
             Y = sum(X.*(v.'),2);
             UpVec = (vecnorm(X,2,2).^2)./(1+Y); % Update Vector
-            [~, l] = max(UpVec);
+            [~, l] = max(abs(UpVec));
+            if UpVec(l) <= 0
+                fprintf('Negative Trace Error 1\n');
+            end
             p = V(l); % actuator no. at that time instant
             V = setdiff(V,p); % Remove the selected actuator
             % k = ceil(p/m); j = p-(k-1)*m; % Find the time step and actuator no.
@@ -41,6 +44,13 @@ function [S,S_k] = FullBLI(A,B,K,s)
                 S = union(S,j);
                 v1 = AiB(:,p);
                 IW_S = IW_S - ((IW_S*(v1*v1.')*IW_S)/(1+v1.'*IW_S*v1));
+                % Check Error Between Rank-1 Update and Actual Inverse
+                %
+                TIW_S = (R(:,S)*R(:,S).'+e_0*eye(n))\eye(n);
+                InvErr = norm(IW_S-TIW_S,'fro');
+                str = sprintf('Error in Inverse %.2f \n',InvErr);
+                fprintf(str);
+                %}
             end
             %{
             fprintf(strcat(num2str(p),' \n'));
@@ -54,6 +64,11 @@ function [S,S_k] = FullBLI(A,B,K,s)
     if rank(R(:,S))<n
         fprintf("Rank Deficient \n");
     end
+    e_t=1e-2;
+    %IW_S = (R(:,S)*R(:,S).'+e_t*eye(n))\eye(n);
+    [U,D,W] = svd(R(:,S)*R(:,S).'+e_t*eye(n));
+    ID = diag(1./diag(D));
+    IW_S = U*ID*W.';
     %{
     str = sprintf("The trace value is %.3f\n",trace(IW_S));
     fprintf(str);

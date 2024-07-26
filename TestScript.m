@@ -126,10 +126,26 @@ xlabel('time (T)'); ylabel('$10\log{\bf E||xf-x||^2}$','Interpreter','latex');
 title(str); ylim([0 40])
 %% Test FullBI.m (Find LI Columns that minimize Tr(W_S^{-1}))
 clc;
-n=100; rng(1);
+n=100; rng(0);
 A = zeros(n); r = 15;
 for i =1:100
     A2 = Erdos_Renyi(n-15,1); A(1:n-15,1:n-15) = A2;  B = rand(n);
     s = max(r,n-rank(A)); K = ceil(n/s);
-    [S,S_k]=FullBLI(A,B,K,s);
+    [S,S_k]=FullBLI(A,B,K,s,1e-5);
 end
+%% Test RandomCluster.m
+clear;clc; rng(0);
+MA = RandomCluster(10,100);
+for i = 100
+    if rank(MA(:,:,1)) < 20
+        error('Rank Deficient');
+    end
+end
+%% ER max abs EigenValue Distribution
+NSys = 100000; n =100;
+MaxEig=zeros(NSys,1);
+parfor i =1:NSys
+    A = Erdos_Renyi(n,1);
+    MaxEig(i)=eigs(A,1);
+end
+histogram(MaxEig,10)
