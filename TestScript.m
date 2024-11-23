@@ -141,11 +141,48 @@ for i = 100
         error('Rank Deficient');
     end
 end
-%% ER max abs EigenValue Distribution
-NSys = 100000; n =100;
+%% ER max, min abs EigenValue Distribution
+clear; clc
+NSys = 10000; n = 100; %p=10; n = 2*p;
 MaxEig=zeros(NSys,1);
+MinEig=zeros(NSys,2);
+pr = 0.2;
+tic;
 parfor i =1:NSys
-    A = Erdos_Renyi(n,1);
+    %A = Erdos_Renyi(n,1);
+    A = Erdos_Renyi_3(n,pr,1)
+    B = eye(n);
+    %{
+    G = rand(n,n);
+    A = G + G.'; % Wishart
+    A = G;
+    A = A/abs(eigs(A,1));
+    %}
+    %MaxEig(i)=eigs(A,1);
+    %MinEig(i)=eigs(A,1,'smallestabs');
+    %R=CtrlMatrix(A,B,n);
+    %W = R*R.';
     MaxEig(i)=eigs(A,1);
+    MinEig(i,:)=eigs(A,2,'smallestabs');
 end
-histogram(MaxEig,10)
+toc;
+histogram(abs(MaxEig),10); figure();
+histogram(abs(MinEig(:,2)),10);
+%% E{K(A)} vs p of A generated from ER with edge probability p
+clear; clc; close all
+p = 0:0.1:0.9; lp = numel(p); NSys = 10000;
+k = zeros(lp,1);
+for j=1:lp
+    pr = p(j);
+    MinSig=zeros(NSys,1);
+    parfor i=1:NSys
+        A = Erdos_Renyi_3(n,pr,1);
+        MinSig(i) = svds(A,1,'smallest');
+    end
+    k(j) = 1/mean(MinSig);
+end
+%%
+plot(p,k,'LineWidth',2.5,'Marker','s','MarkerSize',10);
+xlabel('Probability $p$','Interpreter','latex','FontSize',20);
+ylabel('Condition Number $\bf{E} \{ K(\bf{A}) \}$','Interpreter','latex','FontSize',20);
+set(gca,'FontSize',20,'FontWeight','bold')

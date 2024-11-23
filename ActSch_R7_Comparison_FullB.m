@@ -1,20 +1,24 @@
 %% Result I : f_opt vs Sparsity - Comparision of Greedy vs Actuator Schedulers
 clear; clc; close all
-n = 100; m = n; % State, Input dimension, Control Time Steps
+n = 20; m = n; % State, Input dimension, Control Time Steps
 %lowlvl = 3;
 rng(0); %stp = 2;
-S = 2:8; % Sparsity Level
+
+NSys = 1;
+MA = 2*Erdos_Renyi_3(n,0.9,NSys);
+
+lowlvl = n-rank(MA);
+S = lowlvl:lowlvl+7; % Sparsity Level
 lg = length(S);
 Ropt = zeros(2,lg); % Row 1 - Unweighted, Row 2 - Weighted
 Sopt = zeros(3,lg); % Row 1 - Unweighted, Row 2 - Weighted
-NSys = 100;
 Giopt = zeros(NSys,lg); % Forward Greedy
 Giopt2 = zeros(NSys,lg); % Reverse Greedy
 Riopt = zeros(NSys,lg); % Unweighted
 Rwiopt = zeros(NSys,lg); % Weighted
-Siopt2 = zeros(NSys,lg); % Unweighted (Without Replacement)
-Siopt = zeros(NSys,lg); % Unweighted (From Weighted)
-Swiopt = zeros(NSys,lg); % Weighted
+Siopt2 = 1e30*ones(NSys,lg); % Unweighted (Without Replacement)
+Siopt = 1e30*ones(NSys,lg); % Unweighted (From Weighted)
+Swiopt = 1e30*ones(NSys,lg); % Weighted
 
 % MA = randn(n,n,NTrails); MB = randn(n,m,NTrails);
 
@@ -35,29 +39,37 @@ end
 clear Msk MskUt Wi Slt
 %}
 
-MA = Erdos_Renyi(n,NSys);
-MB = rand(n,m,NSys);
-% B = eye(n);
+% A is non-singular and S = [2:8]
+%{
+%MA = Erdos_Renyi(n,NSys);
+%MB = rand(n,m,NSys);
+%}
+
+B = 1e2*eye(n);
 % mdl = 'NM2 ';
 % I = eye(n);
 Lthrsh = zeros(NSys,1);
 e_01 = 1e-5; e_0 = 1e-20;
 tic;
-parfor i = 1:NSys
-    A = MA(:,:,i); B = MB(:,:,i);
+for i = 1:NSys
+    A = MA(:,:,i); %B = MB(:,:,i); % Random input matrix
     % A = I - (MD(:,:,i)-MW(:,:,i))/n;
-    % lowlvl = n-rank(A)+2;
-    t = ceil(n/2);
-    R = CtrlMatrix(A,B,t);
+    t = n; R = CtrlMatrix(A,B,t);
+    %NrmZ = trace(inv(R*R.')); % Normalizing Constant
     for k=1:lg
         s = S(k); %t = ceil(n/s);
+        %R = CtrlMatrix(A,B,t); NrmZ = 1; %NrmZ = trace(inv(R*R.'));
         [IW_S,~,S_ki] = FullBLI(A,B,t,s,e_01);
         [S_g,Giopt(i,k)] = GreedyScheduling_Aopt_FullB(R,IW_S,m,S_ki,t,s);
+        %{
         if (t*s > n)
             [S_s,~,Siopt(i,k),Swiopt(i,k),Siopt2(i,k)] = SparseScheduling(R,m,t,s,e_0);
         end
         [S_rw,~,~,Rwiopt(i,k)] = RandSamp_Aopt(R,m,t,s,e_0);
         [S_r,Riopt(i,k)] = RandSamp_Aopt_2(R,m,t,s,e_0);
+        Giopt(i,k) = Giopt(i,k)/NrmZ; Riopt(i,k) = Riopt(i,k)/NrmZ; Rwiopt(i,k) = Rwiopt(i,k)/NrmZ;
+        Siopt(i,k) = Siopt(i,k)/NrmZ; Siopt2(i,k) = Siopt2(i,k)/NrmZ; Swiopt(i,k) = Swiopt(i,k)/NrmZ;
+        %}
     end
     Lthrsh(i) = trace(inv(R*R.' + 0.001*eye(n)));
 end

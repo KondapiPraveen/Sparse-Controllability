@@ -1,9 +1,10 @@
 % Generate Erdos-Renyi Graph
 % Input : n - # nodes
+% Input : p - Edge Probability
 % Input : NSys - # Systems
-function MA = Erdos_Renyi(n,NSys)
+function MA = Erdos_Renyi_3(n,p,NSys)
     MA = zeros(n,n,NSys);
-    p = 2*log(n)/n; % Edge probability
+    %p = 2*log(n)/n;
     MskUt = logical(triu(ones(n),1)); % Upper Traingle Mask
     Slt = binornd(1,p,n*(n-1)/2,NSys); % Bernoulli Distributed Random Numbers
     MW = zeros(n,n,NSys); % Adjacency Matrices
@@ -24,7 +25,7 @@ function MA = Erdos_Renyi(n,NSys)
     
     ExportData = true;
     if ExportData && NSys == 1
-        A = MA; B = I;
+        A = MA; B =I;
         save('./sparse-control/Ipexp/AER_BI.mat','A','B')
     end
 end

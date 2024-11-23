@@ -1,10 +1,10 @@
 % Noisy System - MSE vs ||x_0||^2
 clear; clc; close all
 rng(0)
-NTr = 100; n = 80; m = 2*n; p = n; sig_v = 1e-3; sig_w = sig_v;
+NTr = 100; n = 80; m = 2*n; p = n; %sig_v = 1e-3; sig_w = sig_v;
 NoisedB = [-10,-20,-30,-40]; sig_v = 10.^(NoisedB/20);
 lns = length(NoisedB);
-s = floor((0.1)*n);
+s = floor((0.05)*n);
 %S = floor(10:5:n); %ls = length(S);
 NoisedB = 20*log10(sig_v);
 fct = [0,3,6,9,12,15,18,21]; lfc = length(fct);
@@ -16,17 +16,17 @@ R_x = sqrt(1)*eye(n);
 K = n/2; % # Time Steps
 
 NMSEi1 = zeros(lns,lfc,NTr);
-X0 = randn(n,NTr); X0 = X0./vecnorm(X0); % Final State
-xf = zeros(n,1); % Reachability
+X0 = randn(n,NTr); X0 = X0./vecnorm(X0); % Initial State
+xf = 1*ones(n,1); % Reachability
 initPertb = randn(n,NTr);
 
 A = Erdos_Renyi(n,1); B = randn(n,m); C = rand(p,n);
 
 tic;
-parfor i=1:NTr
-    for f=1:lfc
+parfor i=1:NTr % Iteration over # Trials
+    for f=1:lfc % Norm of x0
         x0 = f*X0(:,i);
-        for ns=1:lns
+        for ns=1:lns % various Noise Levels
             v_sd = sig_v(ns); w_sd = v_sd;
             V = (v_sd^2)*eye(n); W = (w_sd^2)*eye(p);
             R_v = v_sd*eye(n); R_w = w_sd*eye(p);
@@ -39,7 +39,7 @@ parfor i=1:NTr
             X1(:,1) = x0+R_x*(initPertb(:,i));
             X_prd1(:,1) = x0; P1 = R_x;
             
-            for j=1:K
+            for j=1:K % Iteratioin over Time Steps
                 %{          
                 % -- To Shut the Prediction based Control
                 % OMP Input Generation
@@ -108,7 +108,7 @@ figure();
 plot(fct,NMSE1.','LineWidth',3);
 grid on;
 str = sprintf('\\sigma^2 = ');
-legend(strcat(str,num2str(NoisedB.'),' dB'));
+legend(strcat(str,num2str((sig_v.^2).','%.e')),'NumColumns',2);
 ylabel("OMP $10\log{\bf E ||x_f-x||_2^2}$",'Interpreter','latex');
 xlabel('$\bf ||x_0||_2$','Interpreter','latex');
 set(gca,'FontSize',20,'FontWeight','bold');

@@ -30,11 +30,14 @@ function [S, Fopt, LBnd, UBnd, Talys, Talys2] = GreedyScheduling_Aopt_FullB(R,IW
         % p = 0; % To track optimal actuator at a given iteration
 	    % Tropt = trace(IW_S); % Optimal Trace Value
         
+        nrmz = 1;
+        lmdMax = (nrmz-1)*1 + (nrmz)*eigs(IW_S,1);
+        IW_Sp = IW_S/lmdMax;
         v = R(:,V);
-	    X = v.'*IW_S;
+	    X = v.'*IW_Sp;
         Y = sum(X.*v.',2);
 	    % [Trc, l] = max(diag(X*X.')./(1+diag(Y)));
-        UpVec = (vecnorm(X,2,2).^2)./(1+Y); % Update Vector
+        UpVec = (vecnorm(X,2,2).^2)./(1/lmdMax+Y); % Update Vector
         %{
 	    [Trc, l] = max(UpVec(end:-1:1));
         l = length(V)-l+1;

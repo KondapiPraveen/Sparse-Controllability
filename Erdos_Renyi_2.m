@@ -1,9 +1,9 @@
 % Generate Erdos-Renyi Graph
 % Input : n - # nodes
 % Input : NSys - # Systems
-function MA = Erdos_Renyi(n,NSys)
+function MA = Erdos_Renyi_2(n,p,NSys)
     MA = zeros(n,n,NSys);
-    p = 2*log(n)/n; % Edge probability
+    %p = 2*log(n)/n;
     MskUt = logical(triu(ones(n),1)); % Upper Traingle Mask
     Slt = binornd(1,p,n*(n-1)/2,NSys); % Bernoulli Distributed Random Numbers
     MW = zeros(n,n,NSys); % Adjacency Matrices
@@ -14,17 +14,16 @@ function MA = Erdos_Renyi(n,NSys)
         Msk(MskUt) = logical(Slt(:,i));
         % Wi(logical(Msk)) = randn(sum(Msk,'all'),1);
         Wi(logical(Msk)) = 1;
-        MW(:,:,i) = Wi+Wi.';
+        %Wi(~logical(Msk)) = randn(length(Msk));
+        OffDiag = logical(~logical(Msk).*MskUt);
+        Wi(OffDiag) = randn(sum(OffDiag,'all'),1);
+        MW(:,:,i) = Wi+Wi.'+diag(randn(n,1));
+        %
         MD(:,:,i) = diag(sum(Msk+Msk.'));
         MA(:,:,i) = I - (MD(:,:,i)-MW(:,:,i))/n;
+        %}
         % Normalize the matrix with largest eigenvalue
         %l1 = eigs(MA(:,:,i),1); MA(:,:,i) = MA(:,:,i)/l1;
     end
     clear Msk MskUt Wi Slt
-    
-    ExportData = true;
-    if ExportData && NSys == 1
-        A = MA; B = I;
-        save('./sparse-control/Ipexp/AER_BI.mat','A','B')
-    end
 end

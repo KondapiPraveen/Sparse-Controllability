@@ -5,7 +5,7 @@ rng(0)
 % Simulation Parameters
 NoisedB = [-10,-20,-30,-40]; sig_v = 10.^(NoisedB/20);
 lns = length(NoisedB);
-NSys = 100; n = 80; m = 160; p = n; sig_w = sig_v;
+NSys = 1; n = 80; m = 160; p = n; sig_w = sig_v;
 S = floor(5:10:n);
 ls = length(S);
 K = n/2;
@@ -27,7 +27,8 @@ parfor i=1:NSys
     xf = Xf(:,i);
     
     for ns=1:lns %index for noise levels
-        v_sd = sig_v(ns); w_sd = v_sd;
+        % w_sd = sig_v(4);
+        v_sd = sig_v(ns); w_sd = sig_v(ns);
         V = (v_sd^2)*eye(n); W = (w_sd^2)*eye(p);
         R_v = v_sd*eye(n); R_w = w_sd*eye(p);
         v = R_v*randn(n,K); w = R_w*randn(p,K);

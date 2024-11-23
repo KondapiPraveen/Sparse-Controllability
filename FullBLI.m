@@ -45,7 +45,7 @@ function [IW_S,S,S_k] = FullBLI(A,B,K,s,e_0)
                 v1 = AiB(:,p);
                 IW_S = IW_S - ((IW_S*(v1*v1.')*IW_S)/(1+v1.'*IW_S*v1));
                 % Check Error Between Rank-1 Update and Actual Inverse
-                %
+                %{
                 TIW_S = (R(:,S)*R(:,S).'+e_0*eye(n))\eye(n);
                 InvErr = norm(IW_S-TIW_S,'fro');
                 str = sprintf('Error in Inverse %.2f \n',InvErr);
@@ -64,7 +64,7 @@ function [IW_S,S,S_k] = FullBLI(A,B,K,s,e_0)
     if rank(R(:,S))<n
         fprintf("Rank Deficient \n");
     end
-    e_t=1e-2;
+    e_t=0;
     %IW_S = (R(:,S)*R(:,S).'+e_t*eye(n))\eye(n);
     [U,D,W] = svd(R(:,S)*R(:,S).'+e_t*eye(n));
     ID = diag(1./diag(D));

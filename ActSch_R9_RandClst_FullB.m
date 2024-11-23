@@ -13,7 +13,7 @@ for k = 1:NumSubNets
     p = SubNets(k);
     MA = RandomCluster(p,NSys); B = eye(2*p); m =2*p;
     t = c*2*p;
-    parfor i=1:NSys
+    for i=1:NSys
         A = MA(:,:,i); R = CtrlMatrix(A,B,t);
         e_0 = 1e-7;
         [IW_S,~,S_ki] = FullBLI(A,B,t,s,e_0);
