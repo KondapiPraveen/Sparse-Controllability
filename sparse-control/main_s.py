@@ -28,10 +28,10 @@ elif exp_id == 5:
     from examples.ex5 import *
 elif exp_id == 6:
     from examples.ex6 import *
-elif exp_id == 8:
+elif exp_id == 8: # Counter Example
     Data = scipy.io.loadmat('./Ipexp/AER_BI.mat')
-    A = 2*Data.get('A')
-    B = 100*Data.get('B')
+    A = Data.get('A')
+    B = Data.get('B')
 
 
 h = ceil(len(A)/2)

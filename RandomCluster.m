@@ -1,3 +1,6 @@
+% Generate Randomly Connected Sub Networks
+% Input : p - # of Sub Networks (Each has dimension 2)
+% Input : p - # Systems (For independent trials)
 function MA = RandomCluster(p,NSys)
     n = 2*p;
     MA = zeros(n,n,NSys);

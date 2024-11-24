@@ -7,30 +7,35 @@ This Repository contains the source codes for the Sparse Controllability Project
 ### Helper Files
   - CtrlMatrix.m - Generate a Controllability Matrix given A, B, K.  
   - bck_lwr_mtx.m - Generate 2 Large Matrices, One is a Large Block Lower traingle Matrix, Second is column stack of $A^i, i= 1,2,...,K$. Used in MPC Formulation.  
-  - Erdos_Renyi.m - Generate a Erdos Renyi Random Graph where each edge is present with probability $2\frac{\ln(n)}{n}$.  
+  - Erdos_Renyi.m - Generate a Erdos Renyi (ER) Random Graph where each edge is present with probability $2\frac{\ln(n)}{n}$.
+  - Erdos_Renyi_2.m - Generate ER graph with random edge weights when edge is absent.
+  - Erdps_Renyi_3.m - Generate a ER graph with specified edge probability.
+  - RandomCluste.m - Generate randomly interconnected subnetworks
   - FullBLI - Greedy algorithm to find Linearly Independent actuators/columns using A-Optimality $Tr(W_S^{-1})$
   - KF.m - Kalman Filter.  
   - KF_prd.m - Kalman Filter return the prediction for the next state..  
   - OMP.m - Orthogonal Matching Pursuit.  
   - POMP.m - Piecewise OMP.  
-  - SpaIpDsg.m - Sparse Input Design using POMP given $x_0, x_f$ (Algorithm 1 from the Journal Paper).  
+  - SpaIpDsg.m - Sparse Input Design using POMP given $x_0, x_f$ -- *Not used in the current plots*.  
   - SpaIpDsg_1.m - Sparse Input Design using POMP given $x_0, x_f$ (Residue Level is Parameterized).  
-  - SparseScheduling.m - Wrapper file for Deterministic Actuator Scheduling (Setup, CleanUp).  
+  - SparseScheduling.m - Wrapper file for Deterministic Actuator Scheduling (Setup, CleanUp).
+  - SparseScheduling_2.m - Wrapper file for Deterministic Actuator Scheduling with initial schedule.
   - Plotting.m - Organize some plots.  
   - TestScript.m - Test the new Scripts.  
 
 ## Schedulers Routines
   - DualSet.m - Deterministic Actuator Scheduling (Adapted to Piecewise Sparsity).  
-  - DualSet_2.m - Deterministic Actuator Scheduling for Unweighted Scheduling (Adapted to Piecewise Sparsity Case) -- *Not used in the current Plots*.
+  - DualSet_2.m - Deterministic Actuator Scheduling for Unweighted Scheduling (Adapted to Piecewise Sparsity) -- *Not used in the current plots*.
+  - DualSet_3.m - Deterministic Actuator Scheduling with a given initial schedule (Adapted to Piecewise Sparsity). -- *Not used in the current plots*
   - GreedyScheduling_Aopt_1.m - Propsed Greedy Scheduling with A-Optimality $Tr(W_S^{-1})$.  
-  - GreedyScheduling_Aopt_2.m - Reverse Greedy Scheduling with A-Optimality $Tr(W_S^{-1})$ -- *Not used in current Plots*.  
+  - GreedyScheduling_Aopt_2.m - Reverse Greedy Scheduling with A-Optimality $Tr(W_S^{-1})$ -- *Not used in current plots*.  
   - GreedyScheduling_Aopt_FullB - Greedy Scheduling when rank($B$)=$n$ (Initial Set is non-empty).
-  - GreedyScheduling_Eopt.m - Greedy Scheduling with E-Optimality (min. Eigenvalue metric) -- *Not used in the current Plots*.  
-  - GreedyScheduling_Static_Aopt_1.m - Propsed Greedy Scheduling with A-Optimality $Tr(W_S^{-1})$ for Fixed Support Case -- *Not used in the current Plots*.  
+  - GreedyScheduling_Eopt.m - Greedy Scheduling with E-Optimality (min. Eigenvalue metric) -- *Not used in the current plots*.  
+  - GreedyScheduling_Static_Aopt_1.m - Propsed Greedy Scheduling with A-Optimality $Tr(W_S^{-1})$ for Fixed Support Case -- *Not used in the current plots*.  
   - RandomSamp_Aopt.m - Weighted Random Sampling adapted to Piecewise Sparsity.  
-  - RandomSamp_Aopt_1.m - Original Random Sampling (Average Sparsity) -- *Not used in the current Plots*.  
-  - RandomSamp_Aopt_2.m - UnWeighted Random Sampling (Sample actuators without Replacement) adapted to Piecewise Sparsity.  
-  - ImpSamp.m - Derived from the principles of Random Sampling used to PMF to pick the s actuators with highest probability -- *Not used in the current Plots*. 
+  - RandomSamp_Aopt_1.m - Original Random Sampling (Average Sparsity) -- *Not used in the current plots*.  
+  - RandomSamp_Aopt_2.m - Unweighted Random Sampling (Sample actuators without Replacement) adapted to Piecewise Sparsity.  
+  - ImpSamp_Aopt.m - Derived from the principles of Random Sampling used to PMF to pick the s actuators with highest probability -- *Not used in the current plots*. 
 
 
 ## Main Files - Execute to Generate Plots, Data
@@ -40,8 +45,12 @@ This Repository contains the source codes for the Sparse Controllability Project
   - ActSch_R4_TStepsVsSparsity.m - Sparse Actuator Scheduling Result 4 : Bounds for the Number of iterations of Greedy Algorithm to Stop over various Sparsity levels -- *Not used for the current Plots*.  
   - ActSch_R5_ApprxVsSparsity.m - Sparse Actuator Scheduling Result 5 : Ratio of smallest and largest Eigenvalues for some sparsity level compared  to Fully actuated case -- *Not used for the current Plots*.  
   - ActSch_R6_CDFPlot.m - Sparse Actuator Scheduling Result 6 : CDF plot of the proposed Greedy algorithm for fixed support and dynamic support -- **Used in CDC Conference Draft**.
-  - ActSch_R7_Comparison_FullB.m - Comparison of Greedy, Deterministic, Random Scheudlers when rank($B$)=$n$ -- **Used for Journal**
+  - ActSch_R7_Comparison_FullB.m - Comparison of Greedy, Deterministic, Random Scheudlers when rank($B$)=$n$ (Counter Example of s-sparse greedy) -- **Used for Journal**
   - ActSch_R8_NPerfVsFSparsity_FullB.m - Plot $\frac{Tr(W_S^{-1})}{Tr(W^{-1})}$ vs $\frac{s}{m}$ when rank($B$)=$n$ --**Used for Journal**
+  - ActSch_R8_NPerfVsFSparsity_FullB_ARC.m - Above plot for systems generated by Erdos_Renyi_2.
+  - ActSch_R8_NPerfVsFSparsity_FullB_UBnd.m - R8 plot with upper bound from matrix perturbation.
+  - ActSch_R9_RandClst_FullB.m - System is a randomly interconnect network with full row rank B.
+  - ActSch_R11_NPerfVsFSparsity_VarP_FullB - R8 Plot with various edge probability.
   - NsysLS_KF_P_OMP.m - Plot MSE vs Time Steps $K$ (vary $m$) -- **Used for Journal**.  
   - NSysLS_KF_OMP_VarNs - Plot MSE vs Sparsity ($s$) for various $\sigma^2$  -- **Used for Journal**.
   - NSysLS_KF_OMP_Varxf - Plot MSE vs $\Vert \textbf{x}_f \Vert$ for various $s$ -- **Used for Journal**.

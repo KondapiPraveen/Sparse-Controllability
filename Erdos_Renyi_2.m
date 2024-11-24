@@ -1,4 +1,4 @@
-% Generate Erdos-Renyi Graph
+% Generate Erdos-Renyi Graph : Random Edge Weights for No Edges
 % Input : n - # nodes
 % Input : NSys - # Systems
 function MA = Erdos_Renyi_2(n,p,NSys)

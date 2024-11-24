@@ -5,7 +5,7 @@ n = 20; m = n; % State, Input dimension, Control Time Steps
 rng(0); %stp = 2;
 
 NSys = 1;
-MA = 2*Erdos_Renyi_3(n,0.9,NSys);
+MA = 2*Erdos_Renyi_3(n,0.9,NSys); % Counter Example
 
 lowlvl = n-rank(MA);
 S = lowlvl:lowlvl+7; % Sparsity Level
@@ -45,7 +45,7 @@ clear Msk MskUt Wi Slt
 %MB = rand(n,m,NSys);
 %}
 
-B = 1e2*eye(n);
+B = 1e2*eye(n); % Factor 100 for counter example o.w. 1
 % mdl = 'NM2 ';
 % I = eye(n);
 Lthrsh = zeros(NSys,1);
