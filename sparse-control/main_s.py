@@ -13,6 +13,7 @@ from control_design.cost_function import CostFunction
 
 # to save results 
 save_result = True
+fct = 1 # Factor to modify the control horizon
 
 # import model matrices A and B
 exp_id = 8
@@ -29,12 +30,17 @@ elif exp_id == 5:
 elif exp_id == 6:
     from examples.ex6 import *
 elif exp_id == 8: # Counter Example
+    Data = scipy.io.loadmat('./Ipexp/CounterExample.mat')
+    A = Data.get('A')
+    B = Data.get('B')
+    fct = 2
+elif exp_id == 9:
     Data = scipy.io.loadmat('./Ipexp/AER_BI.mat')
     A = Data.get('A')
     B = Data.get('B')
 
 
-h = ceil(len(A)/2)
+h = ceil(len(A)/fct) # control horizon
 print('The control horizon is h = ',h)
 #cost = 'logdet'
 cost = 'tr-inv'

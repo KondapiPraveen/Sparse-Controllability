@@ -2,13 +2,20 @@
 clear; clc; close all
 n = 20; m = n; % State, Input dimension, Control Time Steps
 %lowlvl = 3;
-rng(0); %stp = 2;
+rng(0);  NSys = 1; %stp = 2;
 
-NSys = 1;
-MA = 2*Erdos_Renyi_3(n,0.9,NSys); % Counter Example
+cntExample = 1; % For Counter Example
+if cntExample
+    load ./sparse-control/Ipexp/CounterExample.mat
+    MA = A; B= 10*B;
+else
+   NSys = 100;
+   MA = Erdos_Renyi(n,NSys);
+   MB = rand(n,m,NSys);
+end
 
-lowlvl = n-rank(MA);
-S = lowlvl:lowlvl+7; % Sparsity Level
+lowlvl = max(n-rank(MA),2);
+S = lowlvl:lowlvl+6; % Sparsity Level
 lg = length(S);
 Ropt = zeros(2,lg); % Row 1 - Unweighted, Row 2 - Weighted
 Sopt = zeros(3,lg); % Row 1 - Unweighted, Row 2 - Weighted
@@ -39,13 +46,6 @@ end
 clear Msk MskUt Wi Slt
 %}
 
-% A is non-singular and S = [2:8]
-%{
-%MA = Erdos_Renyi(n,NSys);
-%MB = rand(n,m,NSys);
-%}
-
-B = 1e2*eye(n); % Factor 100 for counter example o.w. 1
 % mdl = 'NM2 ';
 % I = eye(n);
 Lthrsh = zeros(NSys,1);
@@ -54,7 +54,7 @@ tic;
 for i = 1:NSys
     A = MA(:,:,i); %B = MB(:,:,i); % Random input matrix
     % A = I - (MD(:,:,i)-MW(:,:,i))/n;
-    t = n; R = CtrlMatrix(A,B,t);
+    t = ceil(n/2); R = CtrlMatrix(A,B,t);
     %NrmZ = trace(inv(R*R.')); % Normalizing Constant
     for k=1:lg
         s = S(k); %t = ceil(n/s);
