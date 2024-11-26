@@ -1,4 +1,4 @@
-% Noisy Linear System (NsyLS) - MSE vs Time Steps(K)
+% Noisy Linear System (NsyLS) - MSE vs Time Steps(k)
 % Part I - KF + OMP, Part II - KF + POMP
 clear; clc; close all
 rng(0)
@@ -18,7 +18,7 @@ k = 5; % Control Horizon
 
 % Initialization
 Xf = 10*rand(n,NSys); % x0 = Xf;
-x0 = zeros(n,1); initPertb = randn(n, NSys); % Reachability
+x0 = zeros(n,1); initPertb = zeros(n,NSys); %initPertb = randn(n, NSys); % Reachability
 %Xf = zeros(n,1); x0 = 10*rand(n,NSys); % Controllability
 NMSEi1 = zeros(ls,K+1,NSys); NMSEi2 = zeros(ls,K+1,NSys); % OMP, POMP
 UOMP = zeros(ls,K,NSys); UPOMP = zeros(ls,K,NSys);

@@ -7,7 +7,7 @@ rng(0);  NSys = 1; %stp = 2;
 cntExample = 1; % For Counter Example
 if cntExample
     load ./sparse-control/Ipexp/CounterExample.mat
-    MA = A; B= 10*B;
+    MA = A; B = B;
 else
    NSys = 100;
    MA = Erdos_Renyi(n,NSys);
@@ -54,11 +54,11 @@ tic;
 for i = 1:NSys
     A = MA(:,:,i); %B = MB(:,:,i); % Random input matrix
     % A = I - (MD(:,:,i)-MW(:,:,i))/n;
-    t = ceil(n/2); R = CtrlMatrix(A,B,t);
+    % t = n; R = CtrlMatrix(A,B,t); % Comparison against Rnd. and Dtr. Sch.
     %NrmZ = trace(inv(R*R.')); % Normalizing Constant
     for k=1:lg
-        s = S(k); %t = ceil(n/s);
-        %R = CtrlMatrix(A,B,t); NrmZ = 1; %NrmZ = trace(inv(R*R.'));
+        s = S(k); t = ceil(n/s); % Comparison againts geethu's work
+        R = CtrlMatrix(A,B,t); NrmZ = 1; %NrmZ = trace(inv(R*R.'));
         [IW_S,~,S_ki] = FullBLI(A,B,t,s,e_01);
         [S_g,Giopt(i,k)] = GreedyScheduling_Aopt_FullB(R,IW_S,m,S_ki,t,s);
         %{

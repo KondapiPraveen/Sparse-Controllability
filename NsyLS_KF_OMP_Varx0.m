@@ -18,7 +18,7 @@ K = n/2; % # Time Steps
 NMSEi1 = zeros(lns,lfc,NTr);
 X0 = randn(n,NTr); X0 = X0./vecnorm(X0); % Initial State
 xf = 1*ones(n,1); % Reachability
-initPertb = randn(n,NTr);
+initPertb = zeros(n,NTr); % initPertb = randn(n,NTr);
 
 A = Erdos_Renyi(n,1); B = randn(n,m); C = rand(p,n);
 

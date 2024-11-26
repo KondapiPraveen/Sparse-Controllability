@@ -41,7 +41,7 @@ elif exp_id == 9:
 
 
 h = ceil(len(A)/fct) # control horizon
-print('The control horizon is h = ',h)
+print('The control horizon is h =',h)
 #cost = 'logdet'
 cost = 'tr-inv'
 

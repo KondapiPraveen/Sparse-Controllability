@@ -13,7 +13,7 @@ K = n/2;
 % Initialization
 Xf = 10*rand(n,NSys);
 x0 = zeros(n,1); R_x = sqrt(1)*eye(n);% Reachability
-initPertb = randn(n,NSys);
+initPertb = zeros(n,NSys); %initPertb = randn(n,NSys);
 NMSEi1 = zeros(ls,lns,NSys); % NMSE for OMP
 
 % System Matrices
