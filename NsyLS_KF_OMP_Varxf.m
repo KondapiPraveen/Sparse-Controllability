@@ -18,10 +18,12 @@ Xf = randn(n,NTr); Xf = Xf./vecnorm(Xf); % Final State
 x0 = zeros(n,1); % Reachability
 initPertb = zeros(n,NTr); % initPertb = randn(n,NTr);
 
-A = Erdos_Renyi(n,1); B = randn(n,m); C = rand(p,n);
+MA = Erdos_Renyi(n,NTr); MB = randn(n,m,NTr); MC = rand(p,n,NTr);
 
 tic;
 parfor i=1:NTr
+    u_omp = zeros(m,1);
+    A = MA(:,:,i); B = MB(:,:,i); C = MC(:,:,i);
     for f=1:lfc
         xf = f*Xf(:,i);
         for l=1:ls
@@ -101,9 +103,9 @@ toc;
 NMSE1 = 10*log10(sum(NMSEi1,3)/NTr);
 %% Plotting - MSE vs ||xf|| - Varying Sparsity
 figure();
-plot(fct,NMSE1.','LineWidth',3);
+plot(fct,NMSE1.','LineWidth',3,'MarkerSize',10);
 grid on;
-legend(strcat('s = ',num2str(S.')));
+legend(strcat('$s$ = ',num2str(S.')),'NumColumns',2,'Interpreter','latex');
 ylabel("OMP $10\log{\bf E ||x_f-x||_2^2}$",'Interpreter','latex');
 xlabel('$\bf ||x_f||_2$','Interpreter','latex');
 set(gca,'FontSize',20,'FontWeight','bold');

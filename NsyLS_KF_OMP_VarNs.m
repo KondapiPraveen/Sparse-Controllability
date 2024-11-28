@@ -5,7 +5,7 @@ rng(0)
 % Simulation Parameters
 NoisedB = [-10,-20,-30,-40]; sig_v = 10.^(NoisedB/20);
 lns = length(NoisedB);
-NSys = 1; n = 80; m = 160; p = n; sig_w = sig_v;
+NSys = 100; n = 80; m = 160; p = n; sig_w = sig_v;
 S = floor(5:10:n);
 ls = length(S);
 K = n/2;
@@ -60,8 +60,8 @@ parfor i=1:NSys
 
                 %
                 % -- Estimation based Control
-                w = randn(p,1);
-                y1 = C*X1(:,j) + R_w*w;
+                %w = randn(p,1);
+                y1 = C*X1(:,j) + w(:,j);
                 %y2 = C*X2(:,j) + R_w*w; % POMP
 
                 % -- For Controllability shut down the if condition and active
@@ -95,11 +95,11 @@ parfor i=1:NSys
                 %}
                 
                 % System Update
-                v = randn(n,1);
-                X1(:,j+1) = A*X1(:,j) + B*u_omp + R_v*v;
+                %v = randn(n,1);
+                X1(:,j+1) = A*X1(:,j) + B*u_omp + v(:,j);
                 %{          
                 % -- To Shut POMP
-                X2(:,j+1) = A*X2(:,j) + B*u_pomp2 + R_v*v;
+                X2(:,j+1) = A*X2(:,j) + B*u_pomp2 + v(:,j);
                 %}
             end
             NMSEi1(l,ns,i) = vecnorm(xf-X1(:,end)).^2;
@@ -111,12 +111,12 @@ toc;
 NMSE1 = 10*log10(sum(NMSEi1,3)/NSys);
 %% Plotting MSE vs Sparsity -Varying Noise Lvls
 figure();
-plot(S,NMSE1.','LineWidth',3);
+plot(S,NMSE1.','LineWidth',3,'MarkerSize',10);
 grid on;
-str = sprintf('\\sigma^2 = ');
-legend(strcat(str,num2str(NoisedB.'),' dB'));
+str = sprintf('$\\sigma^2$ = ');
+legend(strcat(str,num2str((sig_v.^2).')),'NumColumns',2,'Interpreter','latex');
 ylabel("OMP $10\log{\bf E ||x_f-x||_2^2}$",'Interpreter','latex');
-xlabel('Sparsity S');
+xlabel('Sparsity $(s)$','Interpreter','latex');
 set(gca,'FontSize',20,'FontWeight','bold');
 str = sprintf('OMP n=%d, m=%d, p=%d, NSys = %d',n,m,p,NSys);
 title(str,'FontSize',15,'FontWeight','normal');

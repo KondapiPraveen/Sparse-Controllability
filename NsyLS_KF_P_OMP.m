@@ -3,7 +3,7 @@
 clear; clc; close all
 rng(0)
 % Simulation Parameters
-NSys = 100; n = 80; m = n; p = n; sig_v = 1e-2; sig_w = sig_v;
+NSys = 100; n = 80; m = 2*n; p = n; sig_v = 1e-2; sig_w = sig_v;
 %S = floor(([0.1:0.05:0.25, 1])*m);
 S = ceil((0.1:0.1:0.5)*n);
 NoisedB = 20*log10(sig_v);
@@ -166,15 +166,16 @@ xlabel('Time Steps K','FontSize',12)
 %}
 %% Plotting - MSE vs Time Steps - Varying Sparsity
 figure();
-plot(0:K,NMSE1.','LineWidth',3);
+MkrInd = [1,2,3,4,5,6,7,8,9,11,13,15,17,19,21,23,25];
+plot(0:K,NMSE1.','LineWidth',3,'MarkerIndices',MkrInd,'MarkerSize',10);
 grid on;
-legend(strcat('s = ',num2str(S.')));
+legend(strcat('$s$ = ',num2str(S.')),'Interpreter','latex','NumColumns',2);
 ylabel("OMP $10\log{\bf E ||x_f-x||_2^2}$",'Interpreter','latex');
-xlabel('Time Steps K');
-set(gca,'FontSize',20,'FontWeight','bold');
+xlabel("Time steps $(k)$",'Interpreter','latex');
+set(gca(),'FontSize',20,'FontWeight','bold');
 str = sprintf('OMP n=%d, m=%d, p=%d, NSys = %d, \\sigma^2=%d dB',n,m,p,NSys,NoisedB);
 title(str,'FontSize',15,'FontWeight','normal');
-xlim([0, K]);
+xlim([0, 25]); xticks([0,5,10,15,20,25])
 %% POMP for S
 %{
 figure();

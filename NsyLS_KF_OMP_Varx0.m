@@ -20,10 +20,12 @@ X0 = randn(n,NTr); X0 = X0./vecnorm(X0); % Initial State
 xf = 1*ones(n,1); % Reachability
 initPertb = zeros(n,NTr); % initPertb = randn(n,NTr);
 
-A = Erdos_Renyi(n,1); B = randn(n,m); C = rand(p,n);
+MA = Erdos_Renyi(n,NTr); MB = randn(n,m,NTr); MC = rand(p,n,NTr);
 
 tic;
 parfor i=1:NTr % Iteration over # Trials
+    u_omp = zeros(m,1);
+    A = MA(:,:,i); B = MB(:,:,i); C = MC(:,:,i);
     for f=1:lfc % Norm of x0
         x0 = f*X0(:,i);
         for ns=1:lns % various Noise Levels
@@ -56,8 +58,8 @@ parfor i=1:NTr % Iteration over # Trials
                 %}
                 %
                 % -- Estimation based Control
-                w = randn(p,1);
-                y1 = C*X1(:,j) + R_w*w; % OMP
+                % w = randn(p,1);
+                y1 = C*X1(:,j) + w(:,j); % OMP
                 %y2 = C*X2(:,j) + R_w*w; % POMP
 
                 % -- For Controllability shut down the if condition and active
@@ -89,8 +91,8 @@ parfor i=1:NTr % Iteration over # Trials
                 UPOMP(l,j,i) = Eu_pomp2;
                 %}
                 % System Update
-                v = randn(n,1);
-                X1(:,j+1) = A*X1(:,j) + B*u_omp + R_v*v;
+                % v = randn(n,1);
+                X1(:,j+1) = A*X1(:,j) + B*u_omp + v(:,j);
                 %{          
                 % -- To Shut POMP
                 X2(:,j+1) = A*X2(:,j) + B*u_pomp2 + R_v*v;
@@ -105,10 +107,10 @@ toc;
 NMSE1 = 10*log10(sum(NMSEi1,3)/NTr);
 %% Plotting - MSE vs ||xf|| - Varying Sparsity
 figure();
-plot(fct,NMSE1.','LineWidth',3);
+plot(fct,NMSE1.','LineWidth',3,'MarkerSize',10);
 grid on;
-str = sprintf('\\sigma^2 = ');
-legend(strcat(str,num2str((sig_v.^2).','%.e')),'NumColumns',2);
+str = sprintf('$\\sigma^2$ = ');
+legend(strcat(str,num2str((sig_v.^2).','%.e')),'NumColumns',2,'Interpreter','latex');
 ylabel("OMP $10\log{\bf E ||x_f-x||_2^2}$",'Interpreter','latex');
 xlabel('$\bf ||x_0||_2$','Interpreter','latex');
 set(gca,'FontSize',20,'FontWeight','bold');
