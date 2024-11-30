@@ -1,9 +1,12 @@
 % Selecting LI Columns by minimizing Tr(W_S^{-1})
 % Input -  
-% System Matrices A, B(Rank(B)=n)
+% System Matrices : A, B(Rank(B)=n)
 % Control Time : K >= n/s
 % Sparsity Level : s
-% Output - S (Binary Matrix)
+% Output -
+% IW_S : Inverse of the Contr Gram
+% S : Schedule
+% S_k (Binary Matrix)
 function [IW_S,S,S_k] = FullBLI(A,B,K,s,e_0)
     % Initialization
     m = size(B,2); n = size(A,1);
@@ -17,7 +20,7 @@ function [IW_S,S,S_k] = FullBLI(A,B,K,s,e_0)
         R(:,i*m+1:(i+1)*m)=I;
         rankC(i+1) = rank(I);
         if i<K-1
-            I = A*B;
+            I = A*I;
         end
     end
     % Adding LI Columns that minimize Average Energy

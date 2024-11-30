@@ -7,7 +7,7 @@ rng(0);  NSys = 1; %stp = 2;
 cntExample = 1; % For Counter Example
 if cntExample
     load ./sparse-control/Ipexp/CounterExample.mat
-    MA = A; B = B;
+    MA = A;
 else
    NSys = 100;
    MA = Erdos_Renyi(n,NSys);
@@ -49,7 +49,7 @@ clear Msk MskUt Wi Slt
 % mdl = 'NM2 ';
 % I = eye(n);
 Lthrsh = zeros(NSys,1);
-e_01 = 1e-5; e_0 = 1e-20;
+e_01 = 1e-6; e_0 = 1e-20; % Change e_01 to obtain better result (eliminate -ve trace error)
 tic;
 for i = 1:NSys
     A = MA(:,:,i); %B = MB(:,:,i); % Random input matrix
@@ -57,7 +57,7 @@ for i = 1:NSys
     % t = n; R = CtrlMatrix(A,B,t); % Comparison against Rnd. and Dtr. Sch.
     %NrmZ = trace(inv(R*R.')); % Normalizing Constant
     for k=1:lg
-        s = S(k); t = ceil(n/s); % Comparison againts geethu's work
+        s = S(k); t = ceil(n/s); % For comparison againts geethu's work
         R = CtrlMatrix(A,B,t); NrmZ = 1; %NrmZ = trace(inv(R*R.'));
         [IW_S,~,S_ki] = FullBLI(A,B,t,s,e_01);
         [S_g,Giopt(i,k)] = GreedyScheduling_Aopt_FullB(R,IW_S,m,S_ki,t,s);
@@ -81,7 +81,26 @@ Lthrsh = sum(Lthrsh);
 Gopt = Gopt/NSys; Sopt= Sopt/NSys;
 Ropt = Ropt/NSys; Lthrsh = Lthrsh/NSys;
 toc;
+load('./sparse-control/exp/R7_AER_BTI_N20_Varp.mat')
+%% Plotting - FullB vs s-greedy vs s-greedy+MCMC
+figure();
+semilogy(S,s_greedy_cost,'LineWidth',3,'Marker','d','DisplayName','s-greedy','MarkerSize',10,'Color',"#009900")
+grid on; hold on;
+semilogy(S,s_greedy_mcmc_cost,'r-','LineWidth',3,'Marker','+','DisplayName','s-greedy+mcmc','MarkerSize',10)
+semilogy(S,Gopt(1,:),'b-','LineWidth',3,'Marker','s','DisplayName','RBN-greedy','MarkerSize',10)
+hold off
+legend();
+set(gca,'FontSize',20,'FontWeight','bold')
+xlabel('$\rm{Sparsity (s)}$','Interpreter','latex','FontWeight','bold','FontSize',20);
+ylabel('$\rm{Tr({W_S}^{-1})}$','Interpreter','latex','FontWeight','bold','FontSize',20);
+xlim([S(1) S(end)]);
+lim2 = max([Gopt(1,:),s_greedy_cost(2)]);
+lim1 = min(Gopt(1,:));
+ylim([0.5*lim1,2*lim2]);
+xticks(S);
+yticks([10, 10^3, 10^5, 10^8, 10^10])
 %% Plotting - Main Result
+%{
 figure();
 semilogy(S,Ropt(2,:),'r--','LineWidth',3,'Marker','d','MarkerSize',10,'DisplayName','Random (Weighted)');
 grid on; hold on
@@ -100,9 +119,12 @@ ylabel('$\rm{Tr({W_S}^{-1})}$','Interpreter','latex','FontWeight','bold','FontSi
 title('Tr({W_S}^{-1}) vs Sparsity (s)')
 %ylim([Lthrsh*0.9 max([Gopt(1), Ropt(1,1), Ropt(2,1),Sopt(2,1), Sopt(1,1)])])
 xlim([S(1)-1 S(end)+1]);
-lim = max(Gopt(1,:));
-ylim([100,lim*10]);
+lim2 = max(Gopt(1,:));
+lim1 = min(Gopt(1,:));
+ylim([0.5*lim1,2*lim2]);
+%}
 %%
+%{
 figure();
 X = categorical(S);
 RCE = ones(6,length(S));
@@ -117,6 +139,7 @@ ylabel('Relative Tr({W_S}^{-1}) w.r.t Greedy Scheduling');
 str = sprintf(' N = %d M = %d NSys = %0.1e',n,m,NSys);
 legend('Forward Greedy', 'Reverse Greedy', 'Random (Unweighted)','Random (Weighted)','Deterministic (Unweighted)','Deterministic (Weighted)')
 title(str);
+%}
 %%
 %{
 figure();

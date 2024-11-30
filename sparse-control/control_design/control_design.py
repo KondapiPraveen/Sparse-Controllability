@@ -5,6 +5,7 @@ from typing import *
 from types import NoneType
 from copy import deepcopy
 from random import random, sample
+from scipy.io import savemat
 
 from .cost_function import CostFunction
 from .utils import *
@@ -193,7 +194,7 @@ class Designer:
             else:
                 Bs = [self.B[k][:, schedule_k] for k, schedule_k in enumerate(schedule)]
 
-            cost_best = self.cost.compute(self.A, Bs) if not check_rank else np.inf
+            cost_best = self.cost.compute(self.A, Bs, eps) if not check_rank else np.inf
 
         cand_times = [k for k in range(self.cost.h) if len(schedule[k]) < self.s]
         if check_rank:
@@ -347,13 +348,20 @@ class Designer:
             A_vec=A_all
         )
         if cost_best == np.inf:
-            raise Warning('System is uncontrollable after rank-aware channel selection')
+            savemat('./Ipexp/CounterExample.mat', dict(A = self.A, B = self.B))
+            # raise Warning(f'Sparsity {self.s} : System is uncontrollable after rank-aware channel selection')
+            print(f'Sparsity {self.s} : System is uncontrollable after rank-aware channel selection')
+            e0 = 1e-9
+            # return schedule_best, cost_best
         else:
+            print(f'The cost of the system is {cost_best}')
+            print(f'The actuator schedule is {schedule_best}')
             print('System is controllable, improving cost')
+            e0 = 0
 
         # greedy selection of remaining columns across whole controllability matrix, if budget not exhausted
         ch_cand_dep = [list(set(range(self.m)) - set(schedule_k)) for schedule_k in schedule_best]
-        schedule_best, cost_best = self.greedy(ch_cand_dep, schedule_best)
+        schedule_best, cost_best = self.greedy(ch_cand_dep, schedule_best, eps=e0)
         
         return schedule_best, cost_best
     

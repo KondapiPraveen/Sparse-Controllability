@@ -6,7 +6,7 @@
 %           Talys - Lower Bound on t, Talys2 - Approx Bound on t
 function [S, Fopt, LBnd, UBnd, Talys, Talys2] = GreedyScheduling_Aopt_FullB(R,IW_S,m,S_ki,ts,s)
     n = size(R,1);
-    
+    % e_t = 1e-20;
     % Controllability matrix and Its gramiam
     % R = CtrlMatrix(A,B,ts);
     % W_S = R(:,S)*R(:,S).';
@@ -30,8 +30,8 @@ function [S, Fopt, LBnd, UBnd, Talys, Talys2] = GreedyScheduling_Aopt_FullB(R,IW
         % p = 0; % To track optimal actuator at a given iteration
 	    % Tropt = trace(IW_S); % Optimal Trace Value
         
-        nrmz = 1;
-        lmdMax = (nrmz-1)*1 + (nrmz)*eigs(IW_S,1);
+        nrmz = 0;
+        lmdMax = (1-nrmz)*1 + (nrmz)*eigs(IW_S,1);
         IW_Sp = IW_S/lmdMax;
         v = R(:,V);
 	    X = v.'*IW_Sp;
@@ -81,7 +81,7 @@ function [S, Fopt, LBnd, UBnd, Talys, Talys2] = GreedyScheduling_Aopt_FullB(R,IW
             S = union(S,p);
             v1 = R(:,p);
             IW_S = IW_S - ((IW_S*(v1*v1.')*IW_S)/(1+v1.'*IW_S*v1));
-	        % IW_S = inv(R(:,S)*R(:,S).' + e_t*eye(n));
+	        %IW_S = inv(R(:,S)*R(:,S).' + e_t*eye(n));
         end
         if sum(S_k(k,:)) == s % Remove other actuators in the same time step
             forbid = (k-1)*m+(1:m);

@@ -5,6 +5,7 @@ import pickle
 '''
 import time
 import scipy.io
+import numpy as np
 from numpy.linalg import matrix_rank
 from math import ceil
 
@@ -33,15 +34,11 @@ elif exp_id == 8: # Counter Example
     Data = scipy.io.loadmat('./Ipexp/CounterExample.mat')
     A = Data.get('A')
     B = Data.get('B')
-    fct = 2
 elif exp_id == 9:
     Data = scipy.io.loadmat('./Ipexp/AER_BI.mat')
     A = Data.get('A')
     B = Data.get('B')
 
-
-h = ceil(len(A)/fct) # control horizon
-print('The control horizon is h =',h)
 #cost = 'logdet'
 cost = 'tr-inv'
 
@@ -57,12 +54,14 @@ cost_s_greedy_all = dict.fromkeys(s_vec)
 schedule_s_greedy_mcmc_all = dict.fromkeys(s_vec)
 cost_s_greedy_mcmc_all = dict.fromkeys(s_vec)
 
-# find sparsity schedules
-cost_func = CostFunction(h, cost)
-designer = Designer(A, B, s_init, cost_func)
-
 for s in s_vec:
+    h = ceil(len(A)/s) # control horizon
+    print('The control horizon is h =',h)
     print(f'sparsity: {s} \n')
+
+    # find sparsity schedules
+    cost_func = CostFunction(h, cost)
+    designer = Designer(A, B, s_init, cost_func)
     designer.set_sparsity(s)
 
     start = time.time()
@@ -77,10 +76,14 @@ for s in s_vec:
     print('s-sparse greedy:')
     print(f'cost: {cost_s_greedy} \n')
 
+    if cost_s_greedy == np.inf:
+        e0 = 1e-10
+    else:
+        e0 = 0
     start = time.time()
     # s-sparse MCMC with warm start
     designer.set_algo('mcmc')
-    schedule_s_greedy_mcmc, cost_s_greedy_mcmc = designer.design(schedule=schedule_s_greedy)
+    schedule_s_greedy_mcmc, cost_s_greedy_mcmc = designer.design(schedule=schedule_s_greedy,eps=e0)
     cost_s_greedy_mcmc_all[s] = cost_s_greedy_mcmc
     schedule_s_greedy_mcmc_all[s] = schedule_s_greedy_mcmc
     end = time.time()
@@ -108,4 +111,4 @@ if save_result:
 '''
 
 if save_result:
-    scipy.io.savemat('./exp/R7_AER_BI_N20_Varp.mat', dict(s_greedy_cost = cost_s_greedy_all, s_greedy_mcmc_cost = cost_s_greedy_mcmc_all))
+    scipy.io.savemat("./exp/R7_AER_BHI_N20_Varp.mat", dict(s_greedy_cost = list(cost_s_greedy_all.values()), s_greedy_mcmc_cost = list(cost_s_greedy_mcmc_all.values())))

@@ -5,6 +5,7 @@ import warnings
 
 from typing import *
 from matplotlib.pylab import LinAlgError
+import scipy.linalg
 
 from .utils import fxn
 
@@ -167,6 +168,11 @@ class CostFunction:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             fxn()
+            '''
+            S = scipy.linalg.svd(self._W + eps * np.eye(len(self._W)), compute_uv=False)
+            return np.sum(1/S)
+            '''
+            
             return np.trace(
                 scipy.linalg.solve(
                     self._W + eps * np.eye(len(self._W)),

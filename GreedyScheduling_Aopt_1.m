@@ -106,7 +106,9 @@ function [S, t, Fopt, LBnd, UBnd, Talys, Talys2] = GreedyScheduling_Aopt_1(R,m,t
         %trace(inv(W_S));
     end
     e_a = 0;
-    Fopt = trace(inv(W_S + e_a*eye(n)));
+    Sgval = svd(W_S + e_a*eye(n));
+    Fopt = sum(1./Sgval);
+    %Fopt = trace(inv(W_S + e_a*eye(n)));
     %fprintf('------------------------------\n')
     % fprintf('The Rank of the Sparse Scheduled Controllability Gramian is %d (Greedy Scheduling A Optimality) \n',rank(W_S))
     % fprintf('The Condition no. of the Controllability Gramian is: %d (Greedy Scheduling A Optimality) \n',cond(W_S))
