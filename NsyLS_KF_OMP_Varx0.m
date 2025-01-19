@@ -8,6 +8,8 @@ s = floor((0.05)*n);
 %S = floor(10:5:n); %ls = length(S);
 NoisedB = 20*log10(sig_v);
 fct = [0,3,6,9,12,15,18,21]; lfc = length(fct);
+% CoSaMP parameters
+max_itr = 20; tol=0.1;
 
 % Covariance Matrices
 %V = (sig_v^2)*eye(n); W = (sig_w^2)*eye(p);
@@ -78,7 +80,8 @@ parfor i=1:NTr % Iteration over # Trials
 
                 % OMP Input Generation
                 x_hat1 = xf-A*X_est1(:,j);
-                u_omp = OMP(B,x_hat1,s);
+                %u_omp = OMP(B,x_hat1,s);
+                u_omp = CoSaMP(x_hat1,B,s,max_itr,tol);
                 %Eu_omp = norm(u_omp)^2;
                 %{
                 % -- To Shut POMP

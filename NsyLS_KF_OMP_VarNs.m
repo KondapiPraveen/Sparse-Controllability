@@ -9,6 +9,8 @@ NSys = 100; n = 80; m = 160; p = n; sig_w = sig_v;
 S = floor(5:10:n);
 ls = length(S);
 K = n/2;
+% CoSaMP parameters
+max_itr = 20; tol=0.1;
 
 % Initialization
 Xf = 10*rand(n,NSys);
@@ -80,7 +82,8 @@ parfor i=1:NSys
 
                 % OMP Input Generation
                 x_hat1 = xf-A*X_est1(:,j);
-                u_omp = OMP(B,x_hat1,s);
+                %u_omp = OMP(B,x_hat1,s);
+                u_omp = CoSaMP(x_hat1,B,s,max_itr,tol);
                 Eu_omp = norm(u_omp)^2;
                 UOMP(l,j,i) = Eu_omp;
                 %{
