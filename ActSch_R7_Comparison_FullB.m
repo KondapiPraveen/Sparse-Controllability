@@ -1,11 +1,12 @@
 %% Result I : f_opt vs Sparsity - Comparision of Greedy vs Actuator Schedulers
 clear; clc; close all
-n = 20; m = n; % State, Input dimension, Control Time Steps
+n = 100; m = n; % State, Input dimension, Control Time Steps
 %lowlvl = 3;
-rng(0);  NSys = 1; %stp = 2;
+rng(0); %stp = 2;
 
-cntExample = 1; % For Counter Example
+cntExample = 0; % For Counter Example
 if cntExample
+    NSys = 1;
     load ./sparse-control/Ipexp/CounterExample.mat
     MA = A;
 else
@@ -14,8 +15,9 @@ else
    MB = rand(n,m,NSys);
 end
 
-lowlvl = max(n-rank(MA),2);
-S = lowlvl:lowlvl+6; % Sparsity Level
+%lowlvl = max(n-rank(MA),2);
+%S = lowlvl:lowlvl+6; % Sparsity Level
+S = 2:8;
 lg = length(S);
 Ropt = zeros(2,lg); % Row 1 - Unweighted, Row 2 - Weighted
 Sopt = zeros(3,lg); % Row 1 - Unweighted, Row 2 - Weighted
@@ -51,17 +53,17 @@ clear Msk MskUt Wi Slt
 Lthrsh = zeros(NSys,1);
 e_01 = 1e-6; e_0 = 1e-20; % Change e_01 to obtain better result (eliminate -ve trace error)
 tic;
-for i = 1:NSys
-    A = MA(:,:,i); %B = MB(:,:,i); % Random input matrix
+parfor i = 1:NSys
+    A = MA(:,:,i); B = MB(:,:,i); % Random input matrix
     % A = I - (MD(:,:,i)-MW(:,:,i))/n;
-    % t = n; R = CtrlMatrix(A,B,t); % Comparison against Rnd. and Dtr. Sch.
+    t = ceil(n/2); R = CtrlMatrix(A,B,t); % Comparison against Rnd. and Dtr. Sch.
     %NrmZ = trace(inv(R*R.')); % Normalizing Constant
     for k=1:lg
-        s = S(k); t = ceil(n/s); % For comparison againts geethu's work
-        R = CtrlMatrix(A,B,t); NrmZ = 1; %NrmZ = trace(inv(R*R.'));
+        s = S(k); %t = ceil(n/s); % For comparison againts geethu's work
+        NrmZ = 1; %R = CtrlMatrix(A,B,t); %NrmZ = trace(inv(R*R.'));
         [IW_S,~,S_ki] = FullBLI(A,B,t,s,e_01);
         [S_g,Giopt(i,k)] = GreedyScheduling_Aopt_FullB(R,IW_S,m,S_ki,t,s);
-        %{
+        %
         if (t*s > n)
             [S_s,~,Siopt(i,k),Swiopt(i,k),Siopt2(i,k)] = SparseScheduling(R,m,t,s,e_0);
         end
@@ -81,13 +83,14 @@ Lthrsh = sum(Lthrsh);
 Gopt = Gopt/NSys; Sopt= Sopt/NSys;
 Ropt = Ropt/NSys; Lthrsh = Lthrsh/NSys;
 toc;
-load('./sparse-control/exp/R7_AER_BTI_N20_Varp.mat')
+% load('./sparse-control/exp/R7_AER_BTI_N20_Varp.mat')
 %% Plotting - FullB vs s-greedy vs s-greedy+MCMC
+%{
 figure();
 semilogy(S,s_greedy_cost,'LineWidth',3,'Marker','d','DisplayName','s-greedy','MarkerSize',10,'Color',"#009900")
 grid on; hold on;
 semilogy(S,s_greedy_mcmc_cost,'r-','LineWidth',3,'Marker','+','DisplayName','s-greedy+mcmc','MarkerSize',10)
-semilogy(S,Gopt(1,:),'b-','LineWidth',3,'Marker','s','DisplayName','RBN-greedy','MarkerSize',10)
+semilogy(S,Gopt(1,:),'b-','LineWidth',3,'Marker','s','DisplayName','RBn-greedy','MarkerSize',10)
 hold off
 legend();
 set(gca,'FontSize',20,'FontWeight','bold')
@@ -99,26 +102,28 @@ lim1 = min(Gopt(1,:));
 ylim([0.5*lim1,2*lim2]);
 xticks(S);
 yticks([10, 10^3, 10^5, 10^8, 10^10])
+%}
 %% Plotting - Main Result
-%{
+%
 figure();
 semilogy(S,Ropt(2,:),'r--','LineWidth',3,'Marker','d','MarkerSize',10,'DisplayName','Random (Weighted)');
 grid on; hold on
 %semilogy(S,Sopt(3,:),'LineWidth',3,'Marker','+','MarkerSize',10,'DisplayName','Deterministic (Wo Replacement)','Color',"#000099");
 semilogy(S,Ropt(1,:),'r-','LineWidth',3,'Marker','d','MarkerSize',10,'DisplayName','Random (Unweighted)');
 semilogy(S,Sopt(1,:),'LineWidth',3,'Marker','+','MarkerSize',10,'DisplayName','Deterministic (Unweighted)','Color',"#009900");
-semilogy(S,Gopt(1,:),'b-','LineWidth',3,'Marker','s','MarkerSize',10,'DisplayName','Greedy');
 semilogy(S,Sopt(2,:),'--','LineWidth',3,'Marker','+','MarkerSize',10,'DisplayName','Deterministic (Weighted)','Color',"#009900");
+semilogy(S,Gopt(1,:),'b-','LineWidth',3,'Marker','s','MarkerSize',10,'DisplayName','RB$n$-greedy');
 %semilogy(S,Gopt(2,:),'LineWidth',3,'Marker','s','MarkerSize',10,'DisplayName','Reverse Greedy','Color',"#7E2F8E");
 %semilogy(S,Lthrsh*ones(1,lg),'k-.','LineWidth',3,'DisplayName','No Sparisty Constriant');
 set(gca,'FontSize',20,'FontWeight','bold')
-legend();
+legend('Interpreter','latex');
 xlabel('$\rm{Sparsity (s)}$','Interpreter','latex','FontWeight','bold','FontSize',20);
 ylabel('$\rm{Tr({W_S}^{-1})}$','Interpreter','latex','FontWeight','bold','FontSize',20);
 % title(['NTrails = ', num2str(NSys), ' N = ',num2str(n), ' M = ',num2str(m)])
 title('Tr({W_S}^{-1}) vs Sparsity (s)')
 %ylim([Lthrsh*0.9 max([Gopt(1), Ropt(1,1), Ropt(2,1),Sopt(2,1), Sopt(1,1)])])
-xlim([S(1)-1 S(end)+1]);
+xlim([S(1) S(end)]);
+xticks(S);
 lim2 = max(Gopt(1,:));
 lim1 = min(Gopt(1,:));
 ylim([0.5*lim1,2*lim2]);
