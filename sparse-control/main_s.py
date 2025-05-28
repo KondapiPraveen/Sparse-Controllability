@@ -17,7 +17,7 @@ save_result = True
 fct = 1 # Factor to modify the control horizon
 
 # import model matrices A and B
-exp_id = 8
+exp_id = 10
 if exp_id == 1:
     from examples.ex1 import *
 elif exp_id == 2:
@@ -30,23 +30,33 @@ elif exp_id == 5:
     from examples.ex5 import *
 elif exp_id == 6:
     from examples.ex6 import *
-elif exp_id == 8: # Counter Example
+elif exp_id == 8: # Counter Example N = 3,
     Data = scipy.io.loadmat('./Ipexp/CounterExample.mat')
     A = Data.get('A')
     B = Data.get('B')
-elif exp_id == 9:
-    Data = scipy.io.loadmat('./Ipexp/AER_BI.mat')
+elif exp_id == 9: # N = 20, B = 10*I
+    Data = scipy.io.loadmat('./exp/CounterExample.mat')
     A = Data.get('A')
     B = Data.get('B')
+elif exp_id == 10:
+    Data = scipy.io.loadmat('./../../Data/zachary.mat')
+    ADJ = Data.get('zachary_bin')
+    n = np.shape(ADJ)[0]
+    L = np.diag(ADJ.sum(axis=1)) - ADJ # Laplace of the Graph
+    A = np.eye(n) - (1/n)*(L)
+    B = np.eye(n) # Input Matrix
 
 #cost = 'logdet'
 cost = 'tr-inv'
 
 # sparsity constraints
-s_init = max(len(A) - matrix_rank(A), 1)
-s_step = 1
-s_max = min(s_init + 7, len(B[0]) - s_step)
-s_vec = range(s_init, s_max, s_step)
+# s_init = max(len(A) - matrix_rank(A), 1)
+# s_step = 1
+# s_max = min(s_init + 7, len(B[0]) - s_step)
+# s_vec = range(s_init, s_max, s_step)
+
+s_vec = np.floor(np.linspace(0.1,1,10)*n)
+
 
 # build output vectors
 schedule_s_greedy_all = dict.fromkeys(s_vec)
@@ -111,4 +121,9 @@ if save_result:
 '''
 
 if save_result:
-    scipy.io.savemat("./exp/R7_AER_BHI_N20_Varp.mat", dict(s_greedy_cost = list(cost_s_greedy_all.values()), s_greedy_mcmc_cost = list(cost_s_greedy_mcmc_all.values())))
+    if exp_id == 10:
+        scipy.io.savemat("./exp/R12_Zachary_BI.mat", dict(s_greedy_cost = list(cost_s_greedy_all.values()), s_greedy_mcmc_cost = list(cost_s_greedy_mcmc_all.values())))
+    elif exp_id == 9:
+        scipy.io.savemat("./exp/R7_AER_BTI_N20_Varp.mat", dict(s_greedy_cost = list(cost_s_greedy_all.values()), s_greedy_mcmc_cost = list(cost_s_greedy_mcmc_all.values())))
+    else:
+        scipy.io.savemat("./exp/R7_AER_BTI.mat", dict(s_greedy_cost = list(cost_s_greedy_all.values()), s_greedy_mcmc_cost = list(cost_s_greedy_mcmc_all.values())))
