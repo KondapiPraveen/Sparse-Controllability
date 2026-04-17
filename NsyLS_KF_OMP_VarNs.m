@@ -13,10 +13,11 @@ K = n/2;
 max_itr = 20; tol=0.1;
 
 % Initialization
-Xf = 10*rand(n,NSys);
+Xf = randn(n,NSys); Xf = 30*Xf./vecnorm(Xf); % Target is 30 units away from 0.
 x0 = zeros(n,1); R_x = sqrt(1)*eye(n);% Reachability
 initPertb = zeros(n,NSys); %initPertb = randn(n,NSys);
 NMSEi1 = zeros(ls,lns,NSys); % NMSE for OMP
+LwrBnd = zeros(lns,NSys);
 
 % System Matrices
 MA = Erdos_Renyi(n, NSys);
@@ -82,8 +83,8 @@ parfor i=1:NSys
 
                 % OMP Input Generation
                 x_hat1 = xf-A*X_est1(:,j);
-                %u_omp = OMP(B,x_hat1,s);
-                u_omp = CoSaMP(x_hat1,B,s,max_itr,tol);
+                u_omp = OMP(B,x_hat1,s);
+                %u_omp = CoSaMP(x_hat1,B,s,max_itr,tol);
                 Eu_omp = norm(u_omp)^2;
                 UOMP(l,j,i) = Eu_omp;
                 %{
@@ -105,20 +106,26 @@ parfor i=1:NSys
                 X2(:,j+1) = A*X2(:,j) + B*u_pomp2 + v(:,j);
                 %}
             end
-            NMSEi1(l,ns,i) = vecnorm(xf-X1(:,end)).^2;
+            NMSEi1(l,ns,i) = vecnorm(xf-X1(:,end)).^2/(norm(xf)^2);
         end
+        LwrBnd(ns,i) = (trace(V) + trace(A*P1*A.'))/(norm(xf)^2);
     end
 end
 toc;
 
+lbnd = 10*log10(mean(LwrBnd,2));
 NMSE1 = 10*log10(sum(NMSEi1,3)/NSys);
 %% Plotting MSE vs Sparsity -Varying Noise Lvls
 figure();
+DefaultColors = [0 0.4470 0.7410; 0.8500 0.3250 0.0980; 0.9290 0.6940 0.1250; 0.4940 0.1840 0.5560; ...
+    0.4660 0.6740 0.1880; 0.3010 0.7350 0.9330; 0.6350 0.0780 0.1840];
+Colors = repmat(DefaultColors(1:lns,:),3,1);
+colororder(Colors)
 plot(S,NMSE1.','LineWidth',3,'MarkerSize',10);
 grid on;
 str = sprintf('$\\sigma^2$ = ');
 legend(strcat(str,num2str((sig_v.^2).')),'NumColumns',2,'Interpreter','latex');
-ylabel("OMP $10\log{\bf E ||x_f-x||_2^2}$",'Interpreter','latex');
+ylabel("OMP $10\log{\bf (E ||x_\textit{f}-x||^2/||x_\textit{f}||^2)}$",'Interpreter','latex');
 xlabel('Sparsity $(s)$','Interpreter','latex');
 set(gca,'FontSize',20,'FontWeight','bold');
 str = sprintf('OMP n=%d, m=%d, p=%d, NSys = %d',n,m,p,NSys);

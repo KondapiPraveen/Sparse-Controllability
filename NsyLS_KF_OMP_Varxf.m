@@ -6,14 +6,15 @@ S = floor((0.1:0.1:0.5)*n);
 %S = floor(10:5:n);
 NoisedB = 20*log10(sig_v);
 ls = length(S);
-fct = [0,3,6,9,12,15,18,21]; lfc = length(fct);
+cst = 1.25; % log constant
+fct = 8*cst.^(0:7); lfc = length(fct);
 % CoSaMP parameters
 max_itr = 20; tol=0.1;
 
 % Covariance Matrices
 V = (sig_v^2)*eye(n); W = (sig_w^2)*eye(p);
 R_x = sqrt(1)*eye(n); R_v = sig_v*eye(n); R_w = sig_w*eye(p);
-K = n/2; % # Time Steps
+K = ceil(n/1.5); % # Time Steps
 
 NMSEi1 = zeros(ls,lfc,NTr);
 Xf = randn(n,NTr); Xf = Xf./vecnorm(Xf); % Final State
@@ -27,7 +28,7 @@ parfor i=1:NTr
     u_omp = zeros(m,1);
     A = MA(:,:,i); B = MB(:,:,i); C = MC(:,:,i);
     for f=1:lfc
-        xf = f*Xf(:,i);
+        xf = fct(f)*Xf(:,i);
         for l=1:ls
             s = S(l);
             X1 = zeros(n,K+1); % Record of the State Vectors (OMP)
@@ -74,8 +75,8 @@ parfor i=1:NTr
  
                 % OMP Input Generation
                 x_hat1 = xf-A*X_est1(:,j);
-                % u_omp = OMP(B,x_hat1,s);
-                u_omp = CoSaMP(x_hat1,B,s,max_itr,tol);
+                u_omp = OMP(B,x_hat1,s);
+                %u_omp = CoSaMP(x_hat1,B,s,max_itr,tol);
                 Eu_omp = norm(u_omp)^2;
                 UOMP(l,j,i) = Eu_omp;
                 %{
@@ -97,7 +98,7 @@ parfor i=1:NTr
                 %}
                 %}
             end
-            NMSEi1(l,f,i) = vecnorm(xf-X1(:,end)).^2;
+            NMSEi1(l,f,i) = vecnorm(xf-X1(:,end)).^2/(norm(xf)^2);
         end
     end
 end
@@ -109,7 +110,7 @@ figure();
 plot(fct,NMSE1.','LineWidth',3,'MarkerSize',10);
 grid on;
 legend(strcat('$s$ = ',num2str(S.')),'NumColumns',2,'Interpreter','latex');
-ylabel("OMP $10\log{\bf E ||x_f-x||_2^2}$",'Interpreter','latex');
+ylabel("OMP $10\log{\bf (E ||x_\textit{f}-x||^2/||x_\textit{f}||^2)}$",'Interpreter','latex');
 xlabel('$\bf ||x_f||_2$','Interpreter','latex');
 set(gca,'FontSize',20,'FontWeight','bold');
 str = sprintf('OMP n=%d, m=%d, p=%d, NTr = %d, \\sigma^2=%d dB',n,m,p,NTr,NoisedB);

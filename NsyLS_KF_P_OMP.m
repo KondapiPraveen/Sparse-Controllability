@@ -19,7 +19,8 @@ K = ceil(n/2); % # Time Steps
 k = 5; % Control Horizon
 
 % Initialization
-Xf = 10*rand(n,NSys); % x0 = Xf;
+%Xf = 10*rand(n,NSys); % x0 = Xf;
+Xf = randn(n,NSys); Xf = 30*Xf./vecnorm(Xf); % Target is 30 units away from 0.
 x0 = zeros(n,1); initPertb = zeros(n,NSys); %initPertb = randn(n, NSys); % Reachability
 %Xf = zeros(n,1); x0 = 10*rand(n,NSys); % Controllability
 NMSEi1 = zeros(ls,K+1,NSys); NMSEi2 = zeros(ls,K+1,NSys); % OMP, POMP
@@ -128,8 +129,8 @@ parfor i=1:NSys
             
             % OMP Input Generation
             x_hat1 = xf-A*X_est1(:,j);
-            %u_omp = OMP(B,x_hat1,s);
-            u_omp = CoSaMP(x_hat1,B,s,max_itr,tol);
+            u_omp = OMP(B,x_hat1,s);
+            %u_omp = CoSaMP(x_hat1,B,s,max_itr,tol);
             Eu_omp = norm(u_omp)^2;
             UOMP(l,j,i) = Eu_omp;
             %{
@@ -150,8 +151,8 @@ parfor i=1:NSys
             X2(:,j+1) = A*X2(:,j) + B*u_pomp2 + R_v*v;
             %}
         end
-        NMSEi1(l,:,i) = vecnorm(xf-X1).^2;
-        NMSEi2(l,:,i) = vecnorm(xf-X2).^2;
+        NMSEi1(l,:,i) = vecnorm(xf-X1).^2/(norm(xf)^2);
+        NMSEi2(l,:,i) = vecnorm(xf-X2).^2/(norm(xf)^2); % uncomment for pomp
     end
 end
 toc;
@@ -173,7 +174,7 @@ MkrInd = [1,2,3,4,5,6,7,8,9,11,13,15,17,19,21,23,25];
 plot(0:K,NMSE1.','LineWidth',3,'MarkerIndices',MkrInd,'MarkerSize',10);
 grid on;
 legend(strcat('$s$ = ',num2str(S.')),'Interpreter','latex','NumColumns',2);
-ylabel("OMP $10\log{\bf E ||x_f-x||_2^2}$",'Interpreter','latex');
+ylabel("OMP $10\log{\bf(E ||x_\textit{f}-x||^2/||x_\textit{f}||^2)}$",'Interpreter','latex');
 xlabel("Time steps $(k)$",'Interpreter','latex');
 set(gca(),'FontSize',20,'FontWeight','bold');
 str = sprintf('OMP n=%d, m=%d, p=%d, NSys = %d, \\sigma^2=%d dB',n,m,p,NSys,NoisedB);

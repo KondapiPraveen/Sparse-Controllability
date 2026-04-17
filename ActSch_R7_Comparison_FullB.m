@@ -8,7 +8,8 @@ cntExample = 0; % For Counter Example
 if cntExample
     NSys = 1;
     load ./sparse-control/Ipexp/CounterExample.mat
-    MA = A;
+    MA = A; MB = B;
+    n = size(A,1); m = size(B,2);
 else
    NSys = 100;
    MA = Erdos_Renyi(n,NSys);
@@ -17,7 +18,7 @@ end
 
 %lowlvl = max(n-rank(MA),2);
 %S = lowlvl:lowlvl+6; % Sparsity Level
-S = 2:8;
+S = 2:10;
 lg = length(S);
 Ropt = zeros(2,lg); % Row 1 - Unweighted, Row 2 - Weighted
 Sopt = zeros(3,lg); % Row 1 - Unweighted, Row 2 - Weighted
@@ -30,23 +31,6 @@ Siopt = 1e30*ones(NSys,lg); % Unweighted (From Weighted)
 Swiopt = 1e30*ones(NSys,lg); % Weighted
 
 % MA = randn(n,n,NTrails); MB = randn(n,m,NTrails);
-
-%{
-p = 2*log10(n)/n;
-MskUt = logical(triu(ones(n),1)); % Upper Traingle Mask
-Slt = binornd(1,p,n*(n-1)/2,NSys); % Bernoulli Distributed Random Numbers
-MW = zeros(n,n,NSys); % Adjacency Matrices
-MD = zeros(n,n,NSys); % Degree Matrices
-for i=1:NSys
-    Msk = zeros(n); Wi = zeros(n);
-    Msk(MskUt) = logical(Slt(:,i));
-    % Wi(logical(Msk)) = randn(sum(Msk,'all'),1);
-    Wi(logical(Msk)) = 1;
-    MW(:,:,i) = Wi+Wi.';
-    MD(:,:,i) = diag(sum(Msk+Msk.'));
-end
-clear Msk MskUt Wi Slt
-%}
 
 % mdl = 'NM2 ';
 % I = eye(n);
@@ -67,10 +51,11 @@ parfor i = 1:NSys
         if (t*s > n)
             [S_s,~,Siopt(i,k),Swiopt(i,k),Siopt2(i,k)] = SparseScheduling(R,m,t,s,e_0);
         end
-        [S_rw,~,~,Rwiopt(i,k)] = RandSamp_Aopt(R,m,t,s,e_0);
+        %[S_rw,~,~,Rwiopt(i,k)] = RandSamp_Aopt(R,m,t,s,e_0);
         [S_r,Riopt(i,k)] = RandSamp_Aopt_2(R,m,t,s,e_0);
         Giopt(i,k) = Giopt(i,k)/NrmZ; Riopt(i,k) = Riopt(i,k)/NrmZ; Rwiopt(i,k) = Rwiopt(i,k)/NrmZ;
         Siopt(i,k) = Siopt(i,k)/NrmZ; Siopt2(i,k) = Siopt2(i,k)/NrmZ; Swiopt(i,k) = Swiopt(i,k)/NrmZ;
+        fprintf("System No: %d, Sparsity : %d \n",i,s);
         %}
     end
     Lthrsh(i) = trace(inv(R*R.' + 0.001*eye(n)));
@@ -83,9 +68,9 @@ Lthrsh = sum(Lthrsh);
 Gopt = Gopt/NSys; Sopt= Sopt/NSys;
 Ropt = Ropt/NSys; Lthrsh = Lthrsh/NSys;
 toc;
-% load('./sparse-control/exp/R7_AER_BTI_N20_Varp.mat')
 %% Plotting - FullB vs s-greedy vs s-greedy+MCMC
 %{
+load('./sparse-control/exp/R7_AER_BTI_N20_Varp.mat')
 figure();
 semilogy(S,s_greedy_cost,'LineWidth',3,'Marker','d','DisplayName','s-greedy','MarkerSize',10,'Color',"#009900")
 grid on; hold on;

@@ -8,22 +8,27 @@ function [S, c, Fopt1, Fwopt, Fopt2] = SparseScheduling(R,m,t,s,e_0)
     e_t = 1e-20;
     % R = CtrlMatrix(A,B,t);
     V = ((R*R.')^(-1/2))*R;
-    U = V; % Alg 2
-    % U = eye(m*t); % Alg 3
+    %U = V; % Alg 2
+    U = eye(m*t); % Alg 3
     % I = eye(m); U = (1/sqrt(t))*repmat(I,[1 t]); % Alg 4
     
     [c, S] = DualSet(V,U,s,t);
-    %c = sqrt(c); % S_i(k) % Alg 3, 4
-    c = sqrt(c/(1+(n/(s*t)))); % Alg 2
+    c = sqrt(c); % S_i(k) % Alg 3, 4
+    %c = sqrt(c/(1+(n/(s*t)))); % Alg 2
     c = sqrt(s*t)*c/sqrt(sum(c.^2)); % Normalization
     W_Sw = R*(diag(c)^2)*R.';
+    Fwopt = 1e20*n;
     %Fwopt = trace(inv(W_Sw + e_t*eye(n)));
+    %{
     Dw = svd(W_Sw);
 	Rnk = rank(W_Sw);
     if Rnk<n
         Dw(Rnk+1:end) = e_t;
     end
     Fwopt = sum(1./(Dw + e_t));
+    %}
+    c(c>0) = 1;
+    fprintf("The no. of columns selected %d\n",sum(c));
     W_S = R(:,S)*R(:,S).';
     %Fopt1 = trace(inv(W_S + e_t*eye(n)));
     D = svd(W_S);

@@ -20,7 +20,8 @@ K = ceil(n/2); % # Time Steps
 k = 5; % Control Horizon
 
 % Initialization
-Xf = 10*rand(n,NSys); % x0 = Xf;
+%Xf = 10*rand(n,NSys); % x0 = Xf;
+Xf = randn(n,NSys); Xf = 30*Xf./vecnorm(Xf); % Target is 30 units away from 0.
 x0 = zeros(n,1); initPertb = zeros(n,NSys); %initPertb = randn(n, NSys); % Reachability
 %Xf = zeros(n,1); x0 = 10*rand(n,NSys); % Controllability
 NMSEi1 = zeros(ls,lm,K+1,NSys); NMSEi2 = zeros(ls,lm,K+1,NSys); % OMP, POMP
@@ -155,8 +156,8 @@ for o=1:lm
                 X2(:,j+1) = A*X2(:,j) + B*u_pomp2 + R_v*v;
                 %}
             end
-            NMSEi1(l,o,:,i) = vecnorm(xf-X1).^2;
-            NMSEi2(l,o,:,i) = vecnorm(xf-X2).^2;
+            NMSEi1(l,o,:,i) = vecnorm(xf-X1).^2/(norm(xf)^2);
+            NMSEi2(l,o,:,i) = vecnorm(xf-X2).^2/(norm(xf)^2);
         end
     end
 end
@@ -179,7 +180,7 @@ MkrInd = [1,2,3,4,5,6,7,8,9,11,13,15,17,19,21,23,25];
 plot(M,NMSE1.','LineWidth',2,'MarkerSize',10);
 grid on;
 legend(strcat('$s$ = ',num2str(S.')),'Interpreter','latex','NumColumns',2);
-ylabel("OMP $10\log{\bf E ||x_f-x||_2^2}$",'Interpreter','latex');
+ylabel("OMP $10\log{\bf (E ||x_\textit{f}-x||^2/||x_\textit{f}||^2)}$",'Interpreter','latex');
 xlabel("Input Dimension $(m)$",'Interpreter','latex');
 set(gca(),'FontSize',16,'FontWeight','normal');
 str = sprintf('OMP n=%d, m=%d, p=%d, NSys = %d, \\sigma^2=%d dB',n,m,p,NSys,NoisedB);
